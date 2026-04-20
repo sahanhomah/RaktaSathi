@@ -2,6 +2,8 @@
 
 A Django-based web app for managing blood donors and emergency requests with location-based matching.
 
+RaktaSathi is an online platform that helps people find and donate blood easily. It connects donors, people in need of blood, and blood banks in one place.
+
 ## Features
 - Donor registration with account creation and email OTP verification
 - Blood request submission with urgency levels and mandatory doctor prescription image upload
@@ -59,14 +61,3 @@ The app auto-loads `.env` on startup, so you only configure once.
 - Blood request form: `/request/`
 - Request tracker and completion: `/track/`
 - Admin panel: `/admin/`
-
-vgedvovpyjetfqzm
-
-
-
-
-superuser: admin
-email: admin2000@gmail.com
-pw:adminkopassword
-
-python manage.py runserver 0.0.0.0:8000
