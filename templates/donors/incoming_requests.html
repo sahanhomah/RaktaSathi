@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Incoming Requests{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h2>Incoming Nearby Requests</h2>
+        <p>
+            Matching requests compatible with your donor type <span class="badge text-bg-danger">{{ donor.blood_group }}</span> within <strong><span id="distanceValue">{{ selected_distance_km|floatformat:0 }}</span> km</strong>.
+            {% if not donor.is_available %}Turn availability ON from profile before accepting requests.{% endif %}
+        </p>
+    </div>
+
+    <form method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-md-6">
+            <label for="maxDistance" class="form-label">Maximum distance</label>
+        <input
+            id="maxDistance"
+            name="max_distance_km"
+            type="range"
+                class="form-range"
+            min="1"
+            max="{{ nearby_radius_km }}"
+            step="1"
+            value="{{ selected_distance_km|floatformat:0 }}"
+            oninput="document.getElementById('distanceValue').textContent = this.value"
+                onchange="this.form.submit()"
+        />
+        </div>
+
+        <div class="col-md-2">
+            <label for="id_blood_group" class="form-label">Blood group</label>
+            <select id="id_blood_group" name="blood_group" class="form-select">
+                <option value="">All compatible groups</option>
+                {% for group in blood_group_options %}
+                    <option value="{{ group }}" {% if selected_blood_group == group %}selected{% endif %}>{{ group }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="id_city" class="form-label">City</label>
+            <select id="id_city" name="city" class="form-select">
+                <option value="">All cities</option>
+                {% for city in city_options %}
+                    <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-danger" type="submit">Apply Filters</button>
+            <a class="btn btn-outline-secondary" href="{% url 'donors:incoming_requests' %}">Reset</a>
+        </div>
+    </form>
+
+    {% if accepted_requests %}
+        <div class="panel panel-soft mb-4">
+            <div class="panel-header mb-3">
+                <h3>Accepted Requests In Progress</h3>
+                <p>These requesters are waiting for you. They remain visible here until transaction completion.</p>
+            </div>
+            <div class="request-feed row g-3">
+                {% for item in accepted_requests %}
+                    <div class="col-12 col-lg-6">
+                        <div class="request-card card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <p class="donor-name mb-0">Request #{{ item.request.id }}</p>
+                                    <span class="status-badge notified">In Progress</span>
+                                </div>
+                                <p class="donor-meta mb-1"><strong>Blood group:</strong> <span class="badge text-bg-danger">{{ item.request.blood_group }}</span></p>
+                                <p class="donor-meta mb-1"><strong>Requester:</strong> {{ item.request.requester_name }}</p>
+                                <p class="donor-meta mb-1"><strong>Contact:</strong> {{ item.request.requester_phone }}</p>
+                                {% if item.request.prescription_image %}
+                                    <p class="donor-meta mb-1"><strong>Prescription:</strong> <a href="{{ item.request.prescription_image.url }}" target="_blank" rel="noopener">View prescribed document</a></p>
+                                {% endif %}
+                                <p class="donor-meta mb-1"><strong>City:</strong> {{ item.city }}</p>
+                                <p class="donor-meta mb-1"><strong>Accepted at:</strong> {{ item.request.accepted_at|date:'M d, Y H:i' }}</p>
+                                <p class="donor-meta mb-3"><strong>Urgency:</strong> {{ item.request.get_urgency_display }} | {{ item.request.created_at|date:'M d, Y H:i' }}</p>
+                                <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <span class="donor-distance badge text-bg-light">{{ item.distance_km|floatformat:1 }} km away</span>
+                                    <div class="d-flex gap-2">
+                                        <a class="btn btn-danger btn-sm" href="tel:{{ item.request.requester_phone }}">Call Requester</a>
+                                        <form method="post" class="m-0">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="cancel_accept" />
+                                            <input type="hidden" name="request_id" value="{{ item.request.id }}" />
+                                            <input type="hidden" name="max_distance_km" value="{{ selected_distance_km|floatformat:0 }}" />
+                                            <button class="btn btn-outline-danger btn-sm" type="submit">Cancel Accept</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if nearby_requests %}
+        <div class="request-feed row g-3">
+            {% for item in nearby_requests %}
+                <div class="col-12 col-lg-6">
+                    <div class="request-card card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <p class="donor-name mb-0">Request #{{ item.request.id }}</p>
+                                <span class="status-badge {{ item.request.status }}">{{ item.request.get_status_display }}</span>
+                            </div>
+                            <p class="donor-meta mb-1"><strong>Blood group:</strong> <span class="badge text-bg-danger">{{ item.request.blood_group }}</span></p>
+                            <p class="donor-meta mb-1"><strong>Requester:</strong> {{ item.request.requester_name }}</p>
+                            <p class="donor-meta mb-1"><strong>Contact:</strong> {{ item.request.requester_phone }}</p>
+                            {% if item.request.prescription_image %}
+                                <p class="donor-meta mb-1"><strong>Prescription:</strong> <a href="{{ item.request.prescription_image.url }}" target="_blank" rel="noopener">View prescribed document</a></p>
+                            {% endif %}
+                            <p class="donor-meta mb-1"><strong>City:</strong> {{ item.city }}</p>
+                            <p class="donor-meta mb-3"><strong>Urgency:</strong> {{ item.request.get_urgency_display }} | {{ item.request.created_at|date:'M d, Y H:i' }}</p>
+                            <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <span class="donor-distance badge text-bg-light">{{ item.distance_km|floatformat:1 }} km away</span>
+                                <form method="post" class="m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="accept_request" />
+                            <input type="hidden" name="request_id" value="{{ item.request.id }}" />
+                            <input type="hidden" name="max_distance_km" value="{{ selected_distance_km|floatformat:0 }}" />
+                                    <button class="btn btn-danger btn-sm" type="submit" {% if not donor.is_available %}disabled{% endif %}>
+                                Accept Request
+                            </button>
+                        </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj and page_obj.paginator.num_pages > 1 %}
+            <nav class="mt-4" aria-label="Incoming request pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?max_distance_km={{ selected_distance_km|floatformat:0 }}&blood_group={{ selected_blood_group|urlencode }}&city={{ selected_city|urlencode }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?max_distance_km={{ selected_distance_km|floatformat:0 }}&blood_group={{ selected_blood_group|urlencode }}&city={{ selected_city|urlencode }}&page={{ page_obj.next_page_number }}">Next</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <p class="empty">No nearby incoming requests right now.</p>
+    {% endif %}
+</section>
+{% endblock %}

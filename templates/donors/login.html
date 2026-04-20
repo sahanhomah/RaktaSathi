@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Login{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft mx-auto" style="max-width: 640px;">
+    <div class="panel-header">
+        <h2>Donor Login</h2>
+        <p>Sign in using your registered email or phone number with password.</p>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-floating mb-3">
+            {{ form.username }}
+            <label for="id_username">Email or phone number</label>
+            {% if form.username.errors %}
+                <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ form.password }}
+            <label for="id_password">Password</label>
+            {% if form.password.errors %}
+                <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
+        <div class="d-grid">
+            <button class="btn btn-danger" type="submit">Login</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

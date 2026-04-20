@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Bank | Home{% endblock %}
+
+{% block content %}
+<section class="urgent-banner" role="status" aria-live="polite">
+    <div class="urgent-banner-content">
+        <p><strong>Emergency Help:</strong> Need blood urgently? Call any of these Kathmandu Valley blood banks and hospitals or submit an urgent blood request now.</p>
+        <ul class="emergency-phone-list" aria-label="Major blood banks and hospital numbers in Kathmandu Valley">
+            <li><strong>Central NRCS Blood Bank (Soaltee-Mode):</strong> <a href="tel:014288485">01-4288485</a></li>
+            <li><strong>Lalitpur NRCS Blood Bank (Pulchowk):</strong> <a href="tel:015427033">01-5427033</a></li>
+            <li><strong>Bhaktapur NRCS Blood Bank:</strong> <a href="tel:016611661">01-6611661</a>, <a href="tel:016612266">01-6612266</a></li>
+            <li><strong>Teaching Hospital Blood Bank (Maharajgunj):</strong> <a href="tel:0144123030">01-44123030</a>, <a href="tel:014410911">01-4410911</a></li>
+            <li><strong>Bir Hospital Blood Bank (New Road Gate):</strong> <a href="tel:014221119">01-4221119</a>, <a href="tel:014221988">01-4221988</a></li>
+            <li><strong>Patan Hospital Blood Bank:</strong> <a href="tel:015522295">01-5522295</a></li>
+            <li><strong>Frontline Hospital Blood Bank (Old Baneshwor):</strong> <a href="tel:015970132">01-5970132</a></li>
+            <li><strong>Grande Hospital Blood Bank (Dhapasi):</strong> <a href="tel:015159266">01-5159266</a></li>
+            <li><strong>Nepal Mediciti Hospital Bank (Nakhkhu):</strong> <a href="tel:014217766">01-4217766</a></li>
+        </ul>
+    </div>
+</section>
+
+<section class="home-hero">
+    <div class="home-hero-content mt-3">
+        <p class="eyebrow">Community Blood Network</p>
+        <h1>Donate Blood, Save Lives</h1>
+        <p class="hero-copy">
+            Blood Bank connects verified donors with patients in need, making it faster to find the right blood group nearby during critical moments.
+            Every donation is an act of social responsibility that can save a life.
+        </p>
+        <div class="hero-actions">
+            <a class="btn primary" href="{% url 'donors:register' %}">Donate Blood</a>
+            <a class="btn ghost" href="{% url 'requests:request' %}">Request Blood</a>
+            <a class="btn ghost" href="{% url 'requests:request' %}#recommended-donors">Find Donors Near You</a>
+        </div>
+    </div>
+    <aside class="trust-card mt-3" aria-label="Trust indicators" style="background:#F54927 !important; background-image:none !important;">
+        <p class="trust-title">Trusted Emergency Support</p>
+        <ul>
+            <li>Verified donor profiles and contact details</li>
+            <li>Location-based matching for faster response</li>
+            <li>Support for both normal and emergency cases</li>
+        </ul>
+    </aside>
+</section>
+
+<section class="home-features" aria-label="Key features">
+    <article class="feature-card">
+        <h3>Easy donor registration</h3>
+        <p>Simple sign-up with phone, email verification, and live location capture.</p>
+    </article>
+    <article class="feature-card">
+        <h3>Quick blood request process</h3>
+        <p>Submit a request in minutes and instantly receive nearby donor recommendations.</p>
+    </article>
+    <article class="feature-card">
+        <h3>Location-based donor search</h3>
+        <p>Distance-aware matching helps connect patients to the closest available donors.</p>
+    </article>
+    <article class="feature-card">
+        <h3>Emergency support availability</h3>
+        <p>Urgent requests are prioritized to reduce delay in life-threatening situations.</p>
+    </article>
+</section>
+
+<section class="stats-grid" aria-label="Impact statistics">
+    <article class="stat-card">
+        <p class="stat-label">Lives saved</p>
+        <p class="stat-value">{{ lives_saved }}</p>
+    </article>
+    <article class="stat-card">
+        <p class="stat-label">Registered donors</p>
+        <p class="stat-value">{{ registered_donors }}</p>
+    </article>
+    <article class="stat-card">
+        <p class="stat-label">Emergency requests fulfilled</p>
+        <p class="stat-value">{{ emergency_fulfilled }}</p>
+    </article>
+    <article class="stat-card">
+        <p class="stat-label">Available donors now</p>
+        <p class="stat-value">{{ available_donors }}</p>
+    </article>
+</section>
+
+<section class="steps-panel" aria-label="How it works">
+    <div class="panel-header">
+        <h2>How it works</h2>
+        <p>Three simple steps to make a life-saving difference.</p>
+    </div>
+    <ol class="steps-list">
+        <li><strong>Register</strong> as a donor with your blood group and location.</li>
+        <li><strong>Donate</strong> when a nearby request matches your profile.</li>
+        <li><strong>Save Lives</strong> by helping patients in urgent need.</li>
+    </ol>
+</section>
+
+<section class="eligibility-section mt-3" aria-label="Donor eligibility criteria">
+    <div class="eligibility-header ">
+        <h2>Eligibility to Donate Blood</h2>
+        <p>Donating blood is a noble act — but it's also a responsibility. Before donating, it's important to know whether you meet the basic health and safety criteria to ensure both donor and patient safety.</p>
+    </div>
+    <div class="eligibility-content">
+        <div class="eligibility-criteria">
+            <h3>Who Can Donate Blood?</h3>
+            <p>To become a blood donor, you should:</p>
+            <ul class="criteria-list">
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Be 18 to 65 years old</span>
+                </li>
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Weight at least 50 kg</span>
+                </li>
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Have a hemoglobin level of 12.5 g/dL or more</span>
+                </li>
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Be in good physical and mental health</span>
+                </li>
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Not have donated blood in the last 3 months (for men) or 4 months (for women)</span>
+                </li>
+                <li>
+                    <span class="blood-drop">🩸</span>
+                    <span>Be free from infections such as HIV, Hepatitis B/C, or malaria</span>
+                </li>
+            </ul>
+            <a class="btn primary" href="{% url 'donors:register' %}" style="margin-top: 20px;">Start Donating Today</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

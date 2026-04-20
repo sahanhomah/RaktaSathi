@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Request{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft mx-auto" style="max-width: 780px;">
+    <div class="panel-header">
+        <h2>Track Blood Request</h2>
+        <p>Enter your request ID and phone number to view updates and complete the transaction.</p>
+    </div>
+
+    <form class="row g-3" method="get">
+        <div class="col-md-6">
+            <label for="request_id">Request ID</label>
+            <input id="request_id" name="request_id" class="form-control" type="text" value="{{ request_id }}" required />
+        </div>
+        <div class="col-md-6">
+            <label for="requester_phone">Requester phone</label>
+            <input id="requester_phone" name="requester_phone" class="form-control" type="text" value="{{ requester_phone }}" required />
+        </div>
+        <div class="col-12 d-grid d-md-block">
+            <button class="btn btn-danger" type="submit">Check status</button>
+        </div>
+    </form>
+</section>
+
+{% if blood_request %}
+<section class="panel panel-soft mx-auto" style="max-width: 780px;">
+    <div class="panel-header">
+        <h3>Request #{{ blood_request.id }}</h3>
+        <p>Status: <span class="status-badge {{ blood_request.status }}">{{ blood_request.get_status_display }}</span></p>
+    </div>
+
+    <p><strong>Requester:</strong> {{ blood_request.requester_name }} ({{ blood_request.requester_phone }})</p>
+    <p><strong>Blood Group:</strong> <span class="badge text-bg-danger">{{ blood_request.blood_group }}</span></p>
+    <p><strong>Urgency:</strong> {{ blood_request.get_urgency_display }}</p>
+
+    {% if blood_request.requester_notification %}
+        <div class="alert">
+            {{ blood_request.requester_notification }}
+        </div>
+    {% endif %}
+
+    {% if blood_request.status == 'notified' and blood_request.accepted_by %}
+        <hr class="section-divider" />
+        <div class="accepted-donor-card">
+            <p class="accepted-donor-eyebrow">Accepted Donor</p>
+            <h4 class="accepted-donor-name">{{ blood_request.accepted_by.full_name }}</h4>
+            <p class="accepted-donor-meta">Phone: <strong>{{ blood_request.accepted_by.phone }}</strong></p>
+            {% if blood_request.accepted_at %}
+                <p class="accepted-donor-meta">Accepted at: {{ blood_request.accepted_at|date:'M d, Y H:i' }}</p>
+            {% endif %}
+            <a class="btn btn-sm btn-danger" href="tel:{{ blood_request.accepted_by.phone }}">Call donor now</a>
+            <p class="accepted-donor-note mb-0 mt-2">Once blood is received, click complete.</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete_request" />
+            <input type="hidden" name="request_id" value="{{ blood_request.id }}" />
+            <input type="hidden" name="requester_phone" value="{{ requester_phone }}" />
+            <button class="btn btn-success" type="submit">Mark transaction complete</button>
+        </form>
+    {% elif blood_request.status == 'fulfilled' %}
+        <p class="empty">This request is already completed.</p>
+    {% endif %}
+</section>
+{% endif %}
+{% endblock %}

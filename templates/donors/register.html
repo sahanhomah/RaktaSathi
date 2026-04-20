@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up as Donor{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h2><i class="bi bi-droplet-half text-danger me-2"></i>Sign Up as a Blood Donor</h2>
+        <p>Create your account and help save lives by donating blood during emergencies.</p>
+    </div>
+
+    {% if not otp_required %}
+    <!-- Step 1: Sign Up Form -->
+    <form class="row g-3" method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="send_otp" />
+        {{ form.latitude }}
+        {{ form.longitude }}
+        
+        <div class="col-12">
+            <h3 class="h5 mt-1">Personal Information</h3>
+        </div>
+        
+        <div class="col-md-6">
+            <label for="id_full_name">Full name *</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+                <div class="invalid-feedback d-block">{{ form.full_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6">
+            <label for="id_phone">Phone number *</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-12">
+            <label for="id_email">Email address *</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text">We'll send a verification code to this email.</div>
+        </div>
+        
+        <div class="col-12">
+            <h3 class="h5 mt-2">Blood Information</h3>
+        </div>
+        
+        <div class="col-md-6">
+            <label for="id_blood_group">Blood group *</label>
+            {{ form.blood_group }}
+            {% if form.blood_group.errors %}
+                <div class="invalid-feedback d-block">{{ form.blood_group.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check form-switch mb-2">
+                {{ form.is_available }}
+                <label class="form-check-label" for="id_is_available">Available to donate</label>
+            </div>
+        </div>
+        
+        <div class="col-12">
+            <h3 class="h5 mt-2">Location</h3>
+        </div>
+        
+        <div class="col-12 map-field">
+            <label>Click on the map to set your location or use buttons below</label>
+            <div class="map-picker" data-map-picker>
+                <p class="map-fallback">Loading map...</p>
+            </div>
+            <div class="form-text">Your location helps us match you with nearby blood requests.</div>
+        </div>
+        
+        <div class="col-12">
+            <h3 class="h5 mt-2">Create Password</h3>
+        </div>
+        
+        <div class="col-md-6">
+            <label for="id_password1">Password *</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6">
+            <label for="id_password2">Confirm password *</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-12 d-flex flex-wrap gap-2">
+            <button class="btn btn-danger" type="submit"><i class="bi bi-envelope-check me-1"></i>Send Verification Code</button>
+            <button class="btn btn-outline-secondary" type="button" data-locate><i class="bi bi-geo-alt me-1"></i>Use My Location</button>
+            <button class="btn btn-outline-secondary" type="button" data-map-reset><i class="bi bi-arrow-counterclockwise me-1"></i>Reset Map</button>
+        </div>
+        
+        {% if form.non_field_errors %}
+            <div class="col-12">
+                <div class="alert alert-danger mb-0">{{ form.non_field_errors.0 }}</div>
+            </div>
+        {% endif %}
+    </form>
+    {% else %}
+    <!-- Step 2: OTP Verification -->
+    <div class="alert alert-success mb-4" role="alert">
+        <h3 class="h5 mb-2"><i class="bi bi-patch-check-fill me-2"></i>Verification Code Sent</h3>
+        <p class="mb-0">
+            We've sent a 6-digit verification code to your email address. 
+            Please check your inbox (and spam folder) and enter the code below.
+        </p>
+    </div>
+    
+    <form class="row g-3" method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="verify_otp" />
+        
+        <div class="col-12">
+            <label for="id_otp" class="form-label">Enter 6-digit verification code</label>
+            {{ otp_form.otp }}
+            {% if otp_form.otp.errors %}
+                <div class="invalid-feedback d-block">{{ otp_form.otp.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text text-center">Code expires in 5 minutes.</div>
+        </div>
+        
+        <div class="col-12 d-grid">
+            <button class="btn btn-danger" type="submit">
+                <i class="bi bi-check-circle me-1"></i>Verify and Complete Sign Up
+            </button>
+        </div>
+        
+        <div class="col-12 text-center text-secondary small">
+            Didn't receive the code?
+            <a href="{% url 'donors:register' %}" class="link-danger fw-semibold text-decoration-none">Start over</a>
+        </div>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

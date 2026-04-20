@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h2>My Profile</h2>
+        <p>Your donor account details.</p>
+    </div>
+
+    {% if donor %}
+        <form method="post" class="mb-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_availability" />
+            {% if donor.is_available %}
+                <button class="btn btn-outline-warning" type="submit">Turn Availability OFF</button>
+            {% else %}
+                <button class="btn btn-success" type="submit">Turn Availability ON</button>
+            {% endif %}
+        </form>
+
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-4">
+                <label>Name</label>
+                <input class="form-control" type="text" value="{{ donor.full_name }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>Blood group</label>
+                <input class="form-control" type="text" value="{{ donor.blood_group }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>Phone number</label>
+                <input class="form-control" type="text" value="{{ donor.phone }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>City</label>
+                <input class="form-control" type="text" value="{{ location_parts.city|default:'Not available' }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>District</label>
+                <input class="form-control" type="text" value="{{ location_parts.district|default:'Not available' }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>Country</label>
+                <input class="form-control" type="text" value="{{ location_parts.country|default:'Not available' }}" readonly />
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label>Availability</label>
+                <input class="form-control" type="text" value="{% if donor.is_available %}Available{% else %}Not available{% endif %}" readonly />
+            </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <div class="panel-header">
+            <h3>Incoming Nearby Requests</h3>
+            <p>
+                You have {{ nearby_requests_count }} matching requests within {{ nearby_radius_km }} km.
+                Open the incoming requests page to view and accept them.
+            </p>
+        </div>
+
+        <a class="btn btn-danger" href="{% url 'donors:incoming_requests' %}">Open Incoming Requests</a>
+    {% else %}
+        <p class="empty">No donor details found for this account.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Blood{% endblock %}
+
+{% block content %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h2>Blood Request</h2>
+        <p>Submit a request and receive the closest eligible donor matches instantly.</p>
+    </div>
+    {% if not current_active_request %}
+    <form class="row g-3" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_request" />
+        {{ form.latitude }}
+        {{ form.longitude }}
+        <div class="col-md-6">
+            <label for="id_requester_name">Requester name</label>
+            {{ form.requester_name }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_requester_phone">Requester phone</label>
+            {{ form.requester_phone }}
+        </div>
+        <div class="col-12">
+            <label for="id_prescription_image">Doctor prescription document image</label>
+            {{ form.prescription_image }}
+            {% if form.prescription_image.help_text %}
+                <small class="text-muted d-block mt-1">{{ form.prescription_image.help_text }}</small>
+            {% endif %}
+            <div id="prescriptionValidationMessage" class="small mt-1" aria-live="polite"></div>
+            {% for error in form.prescription_image.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            <label for="id_blood_group">Blood group</label>
+            {{ form.blood_group }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_urgency">Urgency</label>
+            {{ form.urgency }}
+        </div>
+        <div class="col-12 map-field">
+            <label>Select location on map</label>
+            <div class="map-picker" data-map-picker>
+                <p class="map-fallback">Loading map...</p>
+            </div>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2">
+            <button class="btn btn-danger" type="submit">Submit request</button>
+            <button class="btn btn-outline-secondary" type="button" data-locate>Use my location</button>
+            <button class="btn btn-outline-secondary" type="button" data-map-reset>Reset map</button>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-warning mb-0">You already have an active request. New request creation is disabled until the current request is cancelled or completed.</div>
+    {% endif %}
+</section>
+
+{% if current_active_request %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h3>Current Request Status</h3>
+        <p>Your current request remains here until it is cancelled or completed.</p>
+    </div>
+    <div class="request-feed">
+            <div class="request-card card border-0 shadow-sm">
+                <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+                <div>
+                    <p class="donor-name">Request #{{ current_active_request.id }} • {{ current_active_request.blood_group }}
+                        <span class="status-badge {{ current_active_request.status }}">{{ current_active_request.get_status_display }}</span>
+                    </p>
+                    <p class="donor-meta"><strong>Requester Name:</strong> {{ current_active_request.requester_name }}</p>
+                    <p class="donor-meta"><strong>Requester Contact:</strong> {{ current_active_request.requester_phone }}</p>
+                    {% if current_active_request.prescription_image %}
+                        <p class="donor-meta"><strong>Prescription:</strong> <a href="{{ current_active_request.prescription_image.url }}" target="_blank" rel="noopener">View uploaded document</a></p>
+                    {% endif %}
+                    <p class="donor-meta">Urgency: {{ current_active_request.get_urgency_display }}</p>
+                    <p class="donor-meta">Created: {{ current_active_request.created_at|date:'M d, Y H:i' }}</p>
+                    {% if current_active_request.requester_notification %}
+                        <p class="donor-meta">{{ current_active_request.requester_notification }}</p>
+                    {% endif %}
+                </div>
+                <div class="request-actions">
+                    {% if current_active_request.status == 'notified' and current_active_request.accepted_by %}
+                    <form method="post" class="mb-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="complete_request" />
+                        <input type="hidden" name="request_id" value="{{ current_active_request.id }}" />
+                        <button class="btn btn-success" type="submit">Transaction Complete</button>
+                    </form>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="cancel_request" />
+                        <input type="hidden" name="request_id" value="{{ current_active_request.id }}" />
+                        <button class="btn btn-outline-danger" type="submit">Cancel Request</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+
+            {% if current_active_request.status == 'notified' and current_active_request.accepted_by %}
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-body">
+                    <div class="accepted-donor-card mt-0">
+                        <p class="accepted-donor-eyebrow">Accepted Donor</p>
+                        <h4 class="accepted-donor-name">{{ current_active_request.accepted_by.full_name }}</h4>
+                        <p class="accepted-donor-meta">Phone: <strong>{{ current_active_request.accepted_by.phone }}</strong></p>
+                        {% if current_active_request.accepted_at %}
+                            <p class="accepted-donor-meta">Accepted at: {{ current_active_request.accepted_at|date:'M d, Y H:i' }}</p>
+                        {% endif %}
+                        <a class="btn btn-sm btn-danger" href="tel:{{ current_active_request.accepted_by.phone }}">Call donor now</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+    </div>
+</section>
+{% endif %}
+
+{% if request_record and show_recommendations %}
+<section class="panel panel-soft" id="recommended-donors">
+    <div class="panel-header">
+        <h3>Recommended donors</h3>
+        <p>Top matches sorted by real-world distance.</p>
+    </div>
+    <p class="donor-meta">
+        Save this Request ID for status updates: <strong>#{{ request_record.id }}</strong>
+    </p>
+    {% if recommended %}
+        <div class="recommendations row g-3">
+            {% for item in recommended %}
+                <div class="col-md-6 col-lg-4">
+                <div class="donor-card card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="donor-name">{{ item.donor.full_name }}</p>
+                        <p class="donor-meta mb-0"><span class="badge text-bg-danger">{{ item.donor.blood_group }}</span> • {{ item.donor.phone }}</p>
+                    </div>
+                    <div class="donor-distance">
+                        {{ item.distance_km|floatformat:2 }} km
+                    </div>
+                </div>
+                </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty">No eligible donors found for this blood group.</p>
+    {% endif %}
+
+</section>
+{% endif %}
+
+{% if request_record %}
+<section class="panel panel-soft">
+    <div class="panel-header">
+        <h3>Track this request</h3>
+        <p>
+            Use Request ID <strong>#{{ request_record.id }}</strong> and requester phone
+            to check acceptance updates and mark the transaction complete.
+        </p>
+    </div>
+    <a
+        class="btn btn-outline-secondary"
+        href="{% url 'requests:track_request' %}?request_id={{ request_record.id }}&requester_phone={{ request_record.requester_phone|urlencode }}"
+    >
+        Open Request Tracker
+    </a>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/prescription-validation.js' %}"></script>
+{% endblock %}
