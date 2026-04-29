@@ -26,7 +26,7 @@ class BloodRequestForm(forms.ModelForm):
         max_bytes = int(getattr(settings, 'PRESCRIPTION_MAX_UPLOAD_BYTES', 5 * 1024 * 1024))
         max_size_mb = max_bytes / (1024 * 1024)
         self.fields['prescription_image'].help_text = (
-            f'Upload doctor-prescribed document image (JPG/PNG, up to {max_size_mb:g} MB, paper with visible text).'
+            f'Upload doctor-prescribed document image (JPG/PNG, up to {max_size_mb:g} MB, printed or handwritten text on paper).'
         )
         self.fields['prescription_image'].widget.attrs.update(
             {
@@ -34,9 +34,8 @@ class BloodRequestForm(forms.ModelForm):
                 'data-max-bytes': str(max_bytes),
                 'data-min-width': str(int(getattr(settings, 'PRESCRIPTION_DOC_MIN_WIDTH', 300))),
                 'data-min-height': str(int(getattr(settings, 'PRESCRIPTION_DOC_MIN_HEIGHT', 300))),
-                'data-min-bright-ratio': str(float(getattr(settings, 'PRESCRIPTION_DOC_MIN_BRIGHT_RATIO', 0.50))),
+                'data-min-bright-ratio': str(float(getattr(settings, 'PRESCRIPTION_DOC_MIN_BRIGHT_RATIO', 0.30))),
                 'data-min-text-ratio': str(float(getattr(settings, 'PRESCRIPTION_DOC_MIN_TEXT_RATIO', 0.005))),
-                'data-max-text-ratio': str(float(getattr(settings, 'PRESCRIPTION_DOC_MAX_TEXT_RATIO', 0.45))),
                 'data-text-pixel-threshold': str(int(getattr(settings, 'PRESCRIPTION_DOC_TEXT_PIXEL_THRESHOLD', 140))),
                 'data-min-edge-ratio': str(float(getattr(settings, 'PRESCRIPTION_DOC_MIN_EDGE_RATIO', 0.003))),
             }

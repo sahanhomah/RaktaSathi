@@ -15,9 +15,8 @@
     const maxBytes = toNumber(input.dataset.maxBytes, 5 * 1024 * 1024);
     const minWidth = toNumber(input.dataset.minWidth, 300);
     const minHeight = toNumber(input.dataset.minHeight, 300);
-    const minBrightRatio = toNumber(input.dataset.minBrightRatio, 0.5);
+    const minBrightRatio = toNumber(input.dataset.minBrightRatio, 0.3);
     const minTextRatio = toNumber(input.dataset.minTextRatio, 0.005);
-    const maxTextRatio = toNumber(input.dataset.maxTextRatio, 0.45);
     const textPixelThreshold = toNumber(input.dataset.textPixelThreshold, 140);
     const minEdgeRatio = toNumber(input.dataset.minEdgeRatio, 0.003);
 
@@ -136,11 +135,11 @@
 
                 const metrics = getImageMetrics(img);
                 if (metrics.brightRatio < minBrightRatio) {
-                    resolve({ ok: false, message: 'Prescription image must clearly show a paper-like document background.' });
+                    resolve({ ok: false, message: 'Prescription image must clearly show a document background.' });
                     return;
                 }
-                if (metrics.textRatio < minTextRatio || metrics.textRatio > maxTextRatio) {
-                    resolve({ ok: false, message: 'Prescription image must contain visible text on the document.' });
+                if (metrics.textRatio < minTextRatio) {
+                    resolve({ ok: false, message: 'Prescription image must contain visible writing or text on the document.' });
                     return;
                 }
                 if (metrics.edgeRatio < minEdgeRatio) {

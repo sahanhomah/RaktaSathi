@@ -24,18 +24,31 @@ def build_test_prescription_file(
 	content_type='image/png',
 	image_size=(900, 1200),
 	include_text=True,
+	handwritten=False,
 ):
 	buffer = BytesIO()
 	image = Image.new('RGB', image_size, color='white')
 	if include_text:
 		draw = ImageDraw.Draw(image)
 		draw.rectangle((35, 35, image_size[0] - 35, image_size[1] - 35), outline='black', width=3)
-		draw.text((60, 70), 'Doctor Prescription', fill='black')
-		draw.text((60, 130), 'Patient: Test Requester', fill='black')
-		draw.text((60, 190), 'Diagnosis: Blood transfusion required', fill='black')
-		draw.text((60, 250), 'Advice: Arrange compatible blood urgently', fill='black')
-		draw.text((60, 310), 'Doctor Reg No: NMC-12345', fill='black')
-		draw.text((60, 370), 'Signature: _______________', fill='black')
+		if handwritten:
+			handwritten_lines = [
+				((60, 85), (300, 70)),
+				((60, 155), (420, 145)),
+				((60, 225), (500, 215)),
+				((60, 295), (460, 285)),
+				((60, 365), (380, 355)),
+			]
+			for start, end in handwritten_lines:
+				draw.line([start, end], fill='black', width=5)
+			draw.line((540, 390, 700, 405), fill='black', width=4)
+		else:
+			draw.text((60, 70), 'Doctor Prescription', fill='black')
+			draw.text((60, 130), 'Patient: Test Requester', fill='black')
+			draw.text((60, 190), 'Diagnosis: Blood transfusion required', fill='black')
+			draw.text((60, 250), 'Advice: Arrange compatible blood urgently', fill='black')
+			draw.text((60, 310), 'Doctor Reg No: NMC-12345', fill='black')
+			draw.text((60, 370), 'Signature: _______________', fill='black')
 	image.save(buffer, format=image_format)
 	buffer.seek(0)
 	return SimpleUploadedFile(filename, buffer.read(), content_type=content_type)
@@ -162,7 +175,31 @@ class BloodRequestAccessTests(TestCase):
 		response = self.client.post(self.request_url, payload)
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(BloodRequest.objects.count(), 0)
-		self.assertContains(response, 'Prescription image must contain visible text on the document.')
+		self.assertContains(response, 'Prescription image must contain visible writing or text on the document.')
+
+	def test_request_creation_accepts_handwritten_prescription(self):
+		user = User.objects.create_user(
+			username='+9779800000005',
+			email='requester-handwritten@example.com',
+			password='StrongPass123!',
+		)
+		self.client.force_login(user)
+
+		payload = {
+			'action': 'create_request',
+			'requester_name': 'Requester Handwritten',
+			'requester_phone': '9801110005',
+			'blood_group': 'A+',
+			'latitude': '27.7172',
+			'longitude': '85.3240',
+			'urgency': 'normal',
+			'prescription_image': build_test_prescription_file(handwritten=True),
+		}
+
+		response = self.client.post(self.request_url, payload)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(BloodRequest.objects.count(), 1)
+		self.assertEqual(BloodRequest.objects.first().requester_user, user)
 
 	def test_request_creation_requires_prescription_image(self):
 		user = User.objects.create_user(

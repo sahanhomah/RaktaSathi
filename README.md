@@ -61,3 +61,5 @@ The app auto-loads `.env` on startup, so you only configure once.
 - Blood request form: `/request/`
 - Request tracker and completion: `/track/`
 - Admin panel: `/admin/`
+
+Host locally  - python manage.py runserver 0.0.0.0:8000

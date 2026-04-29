@@ -17,9 +17,8 @@ def _document_validation_thresholds() -> dict:
 	return {
 		'min_width': int(getattr(settings, 'PRESCRIPTION_DOC_MIN_WIDTH', 300)),
 		'min_height': int(getattr(settings, 'PRESCRIPTION_DOC_MIN_HEIGHT', 300)),
-		'min_bright_ratio': float(getattr(settings, 'PRESCRIPTION_DOC_MIN_BRIGHT_RATIO', 0.50)),
+		'min_bright_ratio': float(getattr(settings, 'PRESCRIPTION_DOC_MIN_BRIGHT_RATIO', 0.30)),
 		'min_text_ratio': float(getattr(settings, 'PRESCRIPTION_DOC_MIN_TEXT_RATIO', 0.005)),
-		'max_text_ratio': float(getattr(settings, 'PRESCRIPTION_DOC_MAX_TEXT_RATIO', 0.45)),
 		'text_pixel_threshold': int(getattr(settings, 'PRESCRIPTION_DOC_TEXT_PIXEL_THRESHOLD', 140)),
 		'min_edge_ratio': float(getattr(settings, 'PRESCRIPTION_DOC_MIN_EDGE_RATIO', 0.003)),
 	}
@@ -54,12 +53,12 @@ def _validate_document_like_image(uploaded_file) -> None:
 
 			if bright_ratio < thresholds['min_bright_ratio']:
 				raise ValidationError(
-					'Prescription image must clearly show a paper-like document background.'
+					'Prescription image must clearly show a document background.'
 				)
 
-			if text_ratio < thresholds['min_text_ratio'] or text_ratio > thresholds['max_text_ratio']:
+			if text_ratio < thresholds['min_text_ratio']:
 				raise ValidationError(
-					'Prescription image must contain visible text on the document.'
+					'Prescription image must contain visible writing or text on the document.'
 				)
 
 			if edge_ratio < thresholds['min_edge_ratio']:
