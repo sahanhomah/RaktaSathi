@@ -179,9 +179,11 @@ def profile(request):
 	if donor is None:
 		messages.info(request, 'No donor profile is linked to this account yet.')
 	else:
+		donor.refresh_availability()
 		if request.method == 'POST' and request.POST.get('action') == 'toggle_availability':
 			donor.is_available = not donor.is_available
-			donor.save(update_fields=['is_available', 'updated_at'])
+			donor.availability_reenable_at = None
+			donor.save(update_fields=['is_available', 'availability_reenable_at', 'updated_at'])
 			state = 'ON' if donor.is_available else 'OFF'
 			messages.success(request, f'Availability turned {state}.')
 			return redirect('donors:profile')
@@ -237,6 +239,7 @@ def incoming_requests(request):
 		messages.info(request, 'No donor profile is linked to this account yet.')
 		return redirect('donors:profile')
 
+	donor.refresh_availability()
 	selected_distance_km = NEARBY_REQUEST_RADIUS_KM
 	raw_selected_distance = request.GET.get('max_distance_km') or request.POST.get('max_distance_km')
 	if raw_selected_distance is not None:
@@ -256,6 +259,7 @@ def incoming_requests(request):
 		selected_blood_group = ''
 
 	if request.method == 'POST' and request.POST.get('action') == 'accept_request':
+		donor.refresh_availability()
 		request_id = request.POST.get('request_id')
 		incoming_request_record = BloodRequest.objects.filter(id=request_id).first()
 
@@ -295,6 +299,7 @@ def incoming_requests(request):
 		return redirect(f'{incoming_requests_url}?max_distance_km={selected_distance_km:g}')
 
 	if request.method == 'POST' and request.POST.get('action') == 'cancel_accept':
+		donor.refresh_availability()
 		request_id = request.POST.get('request_id')
 		accepted_request_record = BloodRequest.objects.filter(
 			id=request_id,

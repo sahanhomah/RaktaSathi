@@ -11,10 +11,23 @@ from .forms import BloodRequestForm
 from .models import BloodRequest
 
 
+def _mark_donor_unavailable_after_completion(donor):
+	if donor is None:
+		return
+
+	donor.mark_unavailable_until()
+	donor.save(update_fields=['is_available', 'availability_reenable_at', 'updated_at'])
+
+
+def _refresh_expired_donor_availability():
+	Donor.refresh_expired_availability()
+
+
 EMAIL_NOTIFICATION_RADIUS_KM = 5.0
 
 
 def home(request):
+	_refresh_expired_donor_availability()
 	context = {
 		'available_donors': Donor.objects.filter(is_available=True).count(),
 		'total_requests': BloodRequest.objects.count(),
@@ -30,6 +43,7 @@ def request_blood(request):
 	recommended = []
 	request_record = None
 	show_recommendations = True
+	_refresh_expired_donor_availability()
 	active_statuses = ['pending', 'notified']
 	active_requests = BloodRequest.objects.filter(
 		requester_user=request.user,
@@ -73,6 +87,7 @@ def request_blood(request):
 			request_to_complete.status = 'fulfilled'
 			request_to_complete.fulfilled_at = timezone.now()
 			request_to_complete.save(update_fields=['status', 'fulfilled_at'])
+			_mark_donor_unavailable_after_completion(request_to_complete.accepted_by)
 			messages.success(request, f'Request #{request_to_complete.id} marked as completed.')
 		return redirect('requests:request')
 
@@ -154,6 +169,7 @@ def track_request(request):
 			blood_request.status = 'fulfilled'
 			blood_request.fulfilled_at = timezone.now()
 			blood_request.save(update_fields=['status', 'fulfilled_at'])
+			_mark_donor_unavailable_after_completion(blood_request.accepted_by)
 			messages.success(request, 'Transaction marked as completed. Thank you for confirming.')
 
 	if blood_request is None and request_id and requester_phone:

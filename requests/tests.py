@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
 
@@ -390,5 +391,17 @@ class BloodRequestAccessTests(TestCase):
 
 		self.assertEqual(response.status_code, 302)
 		accepted_request.refresh_from_db()
+		donor.refresh_from_db()
 		self.assertEqual(accepted_request.status, 'fulfilled')
 		self.assertIsNotNone(accepted_request.fulfilled_at)
+		self.assertFalse(donor.is_available)
+		self.assertIsNotNone(donor.availability_reenable_at)
+
+		donor.availability_reenable_at = timezone.now() - timedelta(days=1)
+		donor.is_available = False
+		donor.save(update_fields=['is_available', 'availability_reenable_at', 'updated_at'])
+
+		self.assertTrue(donor.refresh_availability())
+		donor.refresh_from_db()
+		self.assertTrue(donor.is_available)
+		self.assertIsNone(donor.availability_reenable_at)
