@@ -150,6 +150,18 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 PRESCRIPTION_MAX_UPLOAD_BYTES = int(os.getenv('PRESCRIPTION_MAX_UPLOAD_BYTES', str(5 * 1024 * 1024)))
 
+# Prescription image validation thresholds (adjusted to accept handwritten prescriptions)
+PRESCRIPTION_DOC_MIN_WIDTH = int(os.getenv('PRESCRIPTION_DOC_MIN_WIDTH', '300'))
+PRESCRIPTION_DOC_MIN_HEIGHT = int(os.getenv('PRESCRIPTION_DOC_MIN_HEIGHT', '300'))
+# Lower bright ratio to accept handwritten documents with shadows/imperfections
+PRESCRIPTION_DOC_MIN_BRIGHT_RATIO = float(os.getenv('PRESCRIPTION_DOC_MIN_BRIGHT_RATIO', '0.10'))
+# Lower text ratio to accept handwritten/faint text
+PRESCRIPTION_DOC_MIN_TEXT_RATIO = float(os.getenv('PRESCRIPTION_DOC_MIN_TEXT_RATIO', '0.001'))
+# Adjusted threshold for detecting text pixels (accepts lighter handwriting)
+PRESCRIPTION_DOC_TEXT_PIXEL_THRESHOLD = int(os.getenv('PRESCRIPTION_DOC_TEXT_PIXEL_THRESHOLD', '160'))
+# Lower edge ratio to accept softer handwriting strokes
+PRESCRIPTION_DOC_MIN_EDGE_RATIO = float(os.getenv('PRESCRIPTION_DOC_MIN_EDGE_RATIO', '0.001'))
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email configuration (uses SMTP automatically when configured)

@@ -135,11 +135,11 @@
 
                 const metrics = getImageMetrics(img);
                 if (metrics.brightRatio < minBrightRatio) {
-                    resolve({ ok: false, message: 'Prescription image must clearly show a document background.' });
+                    resolve({ ok: false, message: 'Prescription image is too dark. Ensure good lighting when taking the photo.' });
                     return;
                 }
                 if (metrics.textRatio < minTextRatio) {
-                    resolve({ ok: false, message: 'Prescription image must contain visible writing or text on the document.' });
+                    resolve({ ok: false, message: 'Prescription image must contain readable text or handwriting.' });
                     return;
                 }
                 if (metrics.edgeRatio < minEdgeRatio) {
