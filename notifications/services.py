@@ -35,6 +35,7 @@ def send_email_notification_to_donor(blood_request, donor: Donor, distance_km: f
         f'Hello {donor.full_name},\n\n'
         f'A compatible blood request has been posted within {distance_km:.2f} km of your location.\n'
         f'Requester: {blood_request.requester_name}\n'
+        f'Requester phone: {blood_request.requester_phone}\n'
         f'Blood group needed: {blood_request.blood_group}\n'
         f'Urgency: {blood_request.get_urgency_display()}\n\n'
         'Please log in to RaktaSathi and check Incoming Requests if you are available to donate.\n\n'

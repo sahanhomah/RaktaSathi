@@ -80,6 +80,7 @@ class EmailNotificationServiceTests(TestCase):
 		email = mail.outbox[0]
 		self.assertEqual(email.to, ['donor@example.com'])
 		self.assertIn('Urgent Blood Request Nearby', email.subject)
+		self.assertIn('Requester phone: 9801112233', email.body)
 		self.assertEqual(len(email.attachments), 1)
 		self.assertEqual(email.attachments[0][0], 'prescription.png')
 
