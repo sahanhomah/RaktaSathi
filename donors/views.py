@@ -3,6 +3,7 @@ import time
 import urllib.parse
 import urllib.request
 import json
+from datetime import timedelta
 from django.core.paginator import Paginator
 
 from django.conf import settings
@@ -73,6 +74,74 @@ def _get_nearby_requests_for_donor(donor: Donor, max_distance_km: float = NEARBY
 
 	nearby_requests.sort(key=lambda item: (item['urgency_rank'], item['distance_km']))
 	return nearby_requests[:MAX_NEARBY_REQUESTS]
+
+
+def _format_private_request_location(blood_request: BloodRequest) -> str:
+	try:
+		latitude = float(blood_request.latitude)
+		longitude = float(blood_request.longitude)
+	except (TypeError, ValueError):
+		return 'Location kept private'
+
+	inferred_city = _infer_city_from_coordinates(latitude, longitude)
+	if inferred_city != 'Other':
+		return f'{inferred_city} area'
+
+	return f'Approx. {latitude:.2f}, {longitude:.2f}'
+
+
+def _build_donation_history(donor: Donor):
+	history = []
+	completed_donation_dates = []
+
+	for blood_request in BloodRequest.objects.filter(accepted_by=donor).order_by(
+		'-fulfilled_at',
+		'-accepted_at',
+		'-created_at',
+		'-id',
+	):
+		if blood_request.status == 'fulfilled':
+			status_key = 'completed'
+			status_label = 'Completed'
+			status_class = 'text-bg-success'
+			if blood_request.fulfilled_at:
+				completed_donation_dates.append(blood_request.fulfilled_at)
+		elif blood_request.status == 'cancelled':
+			status_key = 'cancelled'
+			status_label = 'Cancelled'
+			status_class = 'text-bg-secondary'
+		else:
+			status_key = 'deferred'
+			status_label = 'Deferred'
+			status_class = 'text-bg-warning'
+
+		donation_date = blood_request.fulfilled_at or blood_request.accepted_at or blood_request.created_at
+		history.append(
+			{
+				'id': blood_request.id,
+				'donation_date': donation_date,
+				'donation_date_display': timezone.localtime(donation_date),
+				'blood_group': blood_request.blood_group,
+				'location_label': _format_private_request_location(blood_request),
+				'donation_type': 'Emergency' if blood_request.urgency == 'emergency' else 'Voluntary',
+				'donation_status': status_key,
+				'donation_status_label': status_label,
+				'donation_status_class': status_class,
+			},
+		)
+
+	history.sort(key=lambda item: item['donation_date'] or timezone.now(), reverse=True)
+	last_completed_donation = max(completed_donation_dates) if completed_donation_dates else None
+	next_eligible_at = last_completed_donation + timedelta(days=90) if last_completed_donation else None
+	eligible_now = next_eligible_at is None or next_eligible_at <= timezone.now()
+
+	return {
+		'history': history,
+		'total_completed_donations': len(completed_donation_dates),
+		'last_completed_donation': timezone.localtime(last_completed_donation) if last_completed_donation else None,
+		'next_donation_eligible_at': next_eligible_at,
+		'next_donation_eligible': eligible_now,
+	}
 
 
 def register_donor(request):
@@ -189,6 +258,7 @@ def profile(request):
 			return redirect('donors:profile')
 
 		nearby_requests_count = len(_get_nearby_requests_for_donor(donor))
+		donation_history = _build_donation_history(donor)
 
 		try:
 			query = urllib.parse.urlencode(
@@ -228,6 +298,11 @@ def profile(request):
 			'location_parts': location_parts,
 			'nearby_requests_count': nearby_requests_count,
 			'nearby_radius_km': int(NEARBY_REQUEST_RADIUS_KM),
+			'past_donation_history': donation_history['history'],
+			'total_completed_donations': donation_history['total_completed_donations'],
+			'last_completed_donation': donation_history['last_completed_donation'],
+			'next_donation_eligible_at': donation_history['next_donation_eligible_at'],
+			'next_donation_eligible': donation_history['next_donation_eligible'],
 		},
 	)
 

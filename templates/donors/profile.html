@@ -62,6 +62,75 @@
         </div>
 
         <a class="btn btn-danger" href="{% url 'donors:incoming_requests' %}">Open Incoming Requests</a>
+
+        <hr class="section-divider" />
+
+        <div class="panel-header mb-3">
+            <h3>Past Donation History</h3>
+            <p>Private summary of completed, deferred, and cancelled donation records linked to your donor account.</p>
+        </div>
+
+        <div class="row g-3 mb-3 donation-summary-grid">
+            <div class="col-md-4">
+                <div class="history-summary-card">
+                    <span class="history-summary-label">Total donations</span>
+                    <strong class="history-summary-value">{{ total_completed_donations }}</strong>
+                    <span class="history-summary-note">Completed donations only</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="history-summary-card">
+                    <span class="history-summary-label">Last donation date</span>
+                    <strong class="history-summary-value">
+                        {% if last_completed_donation %}
+                            {{ last_completed_donation|date:'M d, Y' }}
+                        {% else %}
+                            Not available
+                        {% endif %}
+                    </strong>
+                    <span class="history-summary-note">Based on the latest completed donation</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="history-summary-card">
+                    <span class="history-summary-label">Next donation eligibility</span>
+                    <strong class="history-summary-value">
+                        {% if next_donation_eligible %}
+                            Eligible now
+                        {% else %}
+                            Wait until {{ next_donation_eligible_at|date:'M d, Y' }}
+                        {% endif %}
+                    </strong>
+                    <span class="history-summary-note">We follow the 90-day donation interval</span>
+                </div>
+            </div>
+        </div>
+
+        {% if past_donation_history %}
+            <div class="donation-history-list">
+                {% for donation in past_donation_history %}
+                    <article class="donation-history-item">
+                        <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-start">
+                            <div>
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <h4 class="donation-history-title mb-0">{{ donation.donation_date|date:'M d, Y' }}</h4>
+                                    <span class="badge rounded-pill text-bg-light border">{{ donation.blood_group }}</span>
+                                    <span class="badge rounded-pill text-bg-light border">{{ donation.donation_type }}</span>
+                                </div>
+                                <p class="donation-history-meta mb-1">Location / hospital: {{ donation.location_label }}</p>
+                                <p class="donation-history-meta mb-0">Donation date: {{ donation.donation_date|date:'M d, Y, g:i A' }}</p>
+                            </div>
+                            <span class="badge rounded-pill {{ donation.donation_status_class }} donation-status-badge">{{ donation.donation_status_label }}</span>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="donation-history-empty">
+                <h4 class="h5 mb-2">No donation history yet</h4>
+                <p class="mb-0">Once a donation is recorded here, you will see a private history of your completed and deferred donation activity.</p>
+            </div>
+        {% endif %}
     {% else %}
         <p class="empty">No donor details found for this account.</p>
     {% endif %}

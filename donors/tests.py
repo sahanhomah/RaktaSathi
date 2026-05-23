@@ -4,6 +4,8 @@ from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from unittest.mock import patch
+from django.utils import timezone
+from datetime import timedelta
 
 from requests.models import BloodRequest
 
@@ -160,6 +162,64 @@ class DonorProfileNearbyRequestTests(TestCase):
 		followup = self.client.get(reverse('donors:incoming_requests'))
 		self.assertEqual(followup.status_code, 200)
 		self.assertNotContains(followup, accepted_request.requester_name)
+
+	@patch('donors.views.urllib.request.urlopen', side_effect=Exception('skip geocoder in tests'))
+	def test_profile_shows_donation_history_summary_and_entries(self, _mock_urlopen):
+		completed_request = BloodRequest.objects.create(
+			requester_name='Completed Donation',
+			requester_phone='9870000000',
+			blood_group='A+',
+			latitude='27.710000',
+			longitude='85.320000',
+			urgency='normal',
+			status='fulfilled',
+			accepted_by=self.donor,
+			accepted_at=timezone.now() - timedelta(days=101),
+			fulfilled_at=timezone.now() - timedelta(days=100),
+		)
+		BloodRequest.objects.create(
+			requester_name='Deferred Donation',
+			requester_phone='9870000001',
+			blood_group='A+',
+			latitude='27.711000',
+			longitude='85.321000',
+			urgency='emergency',
+			status='notified',
+			accepted_by=self.donor,
+			accepted_at=timezone.now() - timedelta(days=5),
+		)
+		BloodRequest.objects.create(
+			requester_name='Cancelled Donation',
+			requester_phone='9870000002',
+			blood_group='A+',
+			latitude='27.712000',
+			longitude='85.322000',
+			urgency='normal',
+			status='cancelled',
+			accepted_by=self.donor,
+			accepted_at=timezone.now() - timedelta(days=20),
+		)
+
+		response = self.client.get(reverse('donors:profile'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Past Donation History')
+		self.assertContains(response, 'Total donations')
+		self.assertContains(response, 'Completed donations only')
+		self.assertContains(response, 'Eligible now')
+		self.assertContains(response, completed_request.fulfilled_at.strftime('%b'))
+		self.assertContains(response, 'Voluntary')
+		self.assertContains(response, 'Emergency')
+		self.assertContains(response, 'Completed')
+		self.assertContains(response, 'Deferred')
+		self.assertContains(response, 'Cancelled')
+
+	@patch('donors.views.urllib.request.urlopen', side_effect=Exception('skip geocoder in tests'))
+	def test_profile_shows_empty_state_when_no_donation_history_exists(self, _mock_urlopen):
+		response = self.client.get(reverse('donors:profile'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'No donation history yet')
 
 	@patch('donors.views.urllib.request.urlopen', side_effect=Exception('skip geocoder in tests'))
 	def test_donor_can_cancel_accepted_request(self, _mock_urlopen):

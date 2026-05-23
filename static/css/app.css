@@ -258,6 +258,70 @@ body {
     color: #fff;
 }
 
+.donation-summary-grid {
+    align-items: stretch;
+}
+
+.history-summary-card,
+.donation-history-item,
+.donation-history-empty {
+    background: linear-gradient(180deg, #ffffff, #fbfcff);
+    border: 1px solid rgba(56, 77, 112, 0.1);
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(19, 34, 56, 0.06);
+}
+
+.history-summary-card {
+    height: 100%;
+    padding: 1rem 1.1rem;
+    display: grid;
+    gap: 0.25rem;
+}
+
+.history-summary-label {
+    color: var(--bb-muted);
+    font-size: 0.88rem;
+}
+
+.history-summary-value {
+    font-size: 1.2rem;
+    line-height: 1.25;
+}
+
+.history-summary-note {
+    color: var(--bb-muted);
+    font-size: 0.86rem;
+}
+
+.donation-history-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.donation-history-item {
+    padding: 1rem 1.1rem;
+}
+
+.donation-history-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+}
+
+.donation-history-meta {
+    color: var(--bb-muted);
+    font-size: 0.94rem;
+}
+
+.donation-status-badge {
+    align-self: flex-start;
+}
+
+.donation-history-empty {
+    padding: 1.25rem;
+    color: var(--bb-muted);
+    text-align: center;
+}
+
 .btn.ghost {
     border: 1px solid #cc2431;
     color: #cc2431;

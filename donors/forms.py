@@ -118,6 +118,7 @@ class EmailOtpVerificationForm(forms.Form):
 class DonorLoginForm(AuthenticationForm):
     username = forms.CharField(
         label='Email or phone number',
+        error_messages={'required': 'Please enter your email or phone number.'},
         widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'Email or phone number'}),
     )
 
