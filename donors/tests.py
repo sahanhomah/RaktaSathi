@@ -220,6 +220,14 @@ class DonorProfileNearbyRequestTests(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, 'No donation history yet')
+		self.assertIn('no-store', response.headers.get('Cache-Control', ''))
+
+	@patch('donors.views.urllib.request.urlopen', side_effect=Exception('skip geocoder in tests'))
+	def test_incoming_requests_page_is_not_cached(self, _mock_urlopen):
+		response = self.client.get(reverse('donors:incoming_requests'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertIn('no-store', response.headers.get('Cache-Control', ''))
 
 	@patch('donors.views.urllib.request.urlopen', side_effect=Exception('skip geocoder in tests'))
 	def test_donor_can_cancel_accepted_request(self, _mock_urlopen):

@@ -100,6 +100,19 @@ class BloodRequestAccessTests(TestCase):
 		self.assertEqual(BloodRequest.objects.count(), 1)
 		self.assertEqual(BloodRequest.objects.first().requester_user, user)
 
+	def test_request_page_is_not_cached_for_authenticated_users(self):
+		user = User.objects.create_user(
+			username='+9779800009998',
+			email='requester-cache@example.com',
+			password='StrongPass123!',
+		)
+		self.client.force_login(user)
+
+		response = self.client.get(self.request_url)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertIn('no-store', response.headers.get('Cache-Control', ''))
+
 	def test_request_creation_rejects_unsupported_image_type(self):
 		user = User.objects.create_user(
 			username='+9779800000002',

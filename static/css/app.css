@@ -25,15 +25,20 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem 6vw;
-    background: rgba(255, 255, 255, 0.92);
+    background: #e22a2a;
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(30, 46, 72, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(10px);
     transform: translateY(0);
     transition: transform 220ms ease;
     will-change: transform;
+}
+
+.site-header.is-scrolled {
+    background: #c81f1f;
+    box-shadow: 0 10px 24px rgba(120, 0, 0, 0.18);
 }
 
 .site-header.is-hidden {
@@ -48,6 +53,7 @@ body {
 
 .site-header a {
     text-decoration: none;
+    color: #fff;
 }
 
 .site-header a:hover {
@@ -60,7 +66,7 @@ body {
     width: 1.55rem;
     height: 1.55rem;
     border-radius: 0.45rem;
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    background: #e22a2a;
     color: #fff;
     font-weight: 700;
     font-size: 0.82rem;
@@ -83,7 +89,7 @@ body {
 
 .brand-title {
     margin: 0;
-    color: var(--bb-ink);
+    color: #fff;
     line-height: 1;
     font-size: 1.05rem;
     font-weight: 700;
@@ -92,7 +98,7 @@ body {
 
 .brand-subtitle {
     margin: 0;
-    color: var(--bb-muted);
+    color: rgba(255, 255, 255, 0.82);
     line-height: 1.1;
     text-decoration: none;
 }
@@ -107,13 +113,13 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: var(--bb-ink);
+    color: #fff;
     border-bottom: 2px solid transparent;
     padding: 0.2rem 0;
 }
 
 .nav-links a:hover {
-    border-color: #cc2431;
+    border-color: rgba(255, 255, 255, 0.95);
 }
 
 .nav-logout-form {
@@ -124,14 +130,14 @@ body {
 
 .nav-logout-btn {
     all: unset;
-    color: var(--bb-ink);
+    color: #fff;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     padding: 0.2rem 0;
 }
 
 .nav-logout-btn:hover {
-    border-color: #cc2431;
+    border-color: rgba(255, 255, 255, 0.95);
 }
 
 .page {
@@ -162,7 +168,7 @@ body {
 }
 
 .urgent-banner {
-    background: linear-gradient(124deg, #8d1313, #d62828 55%, #f46a45);
+    background: #e22a2a;
     color: #fff;
     border-radius: var(--bb-radius);
     padding: 1.25rem;
@@ -170,7 +176,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    box-shadow: 0 18px 35px rgba(214, 40, 40, 0.25);
+    box-shadow: 0 10px 10px rgba(211, 16, 16, 0.888);
 }
 
 .urgent-banner a {
@@ -203,7 +209,7 @@ body {
     margin: 0;
     font-size: 0.8rem;
     letter-spacing: 0.08em;
-    color: #c11d1d;
+    color: #e22a2a;
     text-transform: uppercase;
     font-weight: 700;
 }
@@ -227,7 +233,7 @@ body {
 
 .home-hero {
     display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
     gap: 1.5rem;
     margin-bottom: 1.5rem;
 }
@@ -247,14 +253,14 @@ body {
 }
 
 .btn.primary {
-    background: linear-gradient(180deg, #e63946, #cc2431);
+    background: #e22a2a;
     border-color: #cc2431;
     color: #fff;
 }
 
 .btn.primary:hover {
-    background: linear-gradient(180deg, #cf2e3a, #b8202b);
-    border-color: #b8202b;
+    background: #e22a2a;
+    border-color: #cc2431;
     color: #fff;
 }
 
@@ -335,7 +341,7 @@ body {
 
 .trust-card {
     height: 100%;
-    background: linear-gradient(150deg, #ce070e, #d11a1a);
+    background: #e22a2a;
     color: #fff;
     border-radius: var(--bb-radius);
     padding: 1.25rem;
@@ -595,12 +601,12 @@ body {
 }
 
 .btn-danger {
-    background: linear-gradient(180deg, #e63946, #cc2431);
+    background: #e22a2a;
     border-color: #cc2431;
 }
 
 .btn-danger:hover {
-    background: linear-gradient(180deg, #cf2e3a, #b8202b);
+    background: #e22a2a;
     border-color: #b8202b;
 }
 

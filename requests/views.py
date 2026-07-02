@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 
 from donors.models import Donor
 from donors.utils import can_donate_to, haversine_km
@@ -39,6 +40,7 @@ def home(request):
 
 
 @login_required
+@never_cache
 def request_blood(request):
 	recommended = []
 	request_record = None

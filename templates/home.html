@@ -3,22 +3,7 @@
 {% block title %}Blood Bank | Home{% endblock %}
 
 {% block content %}
-<section class="urgent-banner" role="status" aria-live="polite">
-    <div class="urgent-banner-content">
-        <p><strong>Emergency Help:</strong> Need blood urgently? Call any of these Kathmandu Valley blood banks and hospitals or submit an urgent blood request now.</p>
-        <ul class="emergency-phone-list" aria-label="Major blood banks and hospital numbers in Kathmandu Valley">
-            <li><strong>Central NRCS Blood Bank (Soaltee-Mode):</strong> <a href="tel:014288485">01-4288485</a></li>
-            <li><strong>Lalitpur NRCS Blood Bank (Pulchowk):</strong> <a href="tel:015427033">01-5427033</a></li>
-            <li><strong>Bhaktapur NRCS Blood Bank:</strong> <a href="tel:016611661">01-6611661</a>, <a href="tel:016612266">01-6612266</a></li>
-            <li><strong>Teaching Hospital Blood Bank (Maharajgunj):</strong> <a href="tel:0144123030">01-44123030</a>, <a href="tel:014410911">01-4410911</a></li>
-            <li><strong>Bir Hospital Blood Bank (New Road Gate):</strong> <a href="tel:014221119">01-4221119</a>, <a href="tel:014221988">01-4221988</a></li>
-            <li><strong>Patan Hospital Blood Bank:</strong> <a href="tel:015522295">01-5522295</a></li>
-            <li><strong>Frontline Hospital Blood Bank (Old Baneshwor):</strong> <a href="tel:015970132">01-5970132</a></li>
-            <li><strong>Grande Hospital Blood Bank (Dhapasi):</strong> <a href="tel:015159266">01-5159266</a></li>
-            <li><strong>Nepal Mediciti Hospital Bank (Nakhkhu):</strong> <a href="tel:014217766">01-4217766</a></li>
-        </ul>
-    </div>
-</section>
+
 
 <section class="home-hero">
     <div class="home-hero-content mt-3">
@@ -34,52 +19,192 @@
             <a class="btn ghost" href="{% url 'requests:request' %}#recommended-donors">Find Donors Near You</a>
         </div>
     </div>
-    <aside class="trust-card mt-3" aria-label="Trust indicators" style="background:#F54927 !important; background-image:none !important;">
-        <p class="trust-title">Trusted Emergency Support</p>
-        <ul>
-            <li>Verified donor profiles and contact details</li>
-            <li>Location-based matching for faster response</li>
-            <li>Support for both normal and emergency cases</li>
+    <aside class="trust-card mt-3" aria-label="Trust indicators" >
+       <section class="urgent-banner" role="status" aria-live="polite">
+    <div class="urgent-banner-content">
+        <p><strong>Emergency Help:</strong> Need blood urgently? Call any of these Kathmandu Valley blood banks and hospitals or submit an urgent blood request now.</p>
+        <ul class="emergency-phone-list" aria-label="Major blood banks and hospital numbers in Kathmandu Valley">
+            <li><strong>Central NRCS Blood Bank (Soaltee-Mode):</strong> <a href="tel:014288485">01-4288485</a></li>
+            <li><strong>Lalitpur NRCS Blood Bank (Pulchowk):</strong> <a href="tel:015427033">01-5427033</a></li>
+            <li><strong>Bhaktapur NRCS Blood Bank:</strong> <a href="tel:016611661">01-6611661</a>, <a href="tel:016612266">01-6612266</a></li>
+            <li><strong>Teaching Hospital Blood Bank (Maharajgunj):</strong> <a href="tel:0144123030">01-44123030</a>, <a href="tel:014410911">01-4410911</a></li>
+            <li><strong>Bir Hospital Blood Bank (New Road Gate):</strong> <a href="tel:014221119">01-4221119</a>, <a href="tel:014221988">01-4221988</a></li>
+            <li><strong>Patan Hospital Blood Bank:</strong> <a href="tel:015522295">01-5522295</a></li>
+            <li><strong>Frontline Hospital Blood Bank (Old Baneshwor):</strong> <a href="tel:015970132">01-5970132</a></li>
+            <li><strong>Grande Hospital Blood Bank (Dhapasi):</strong> <a href="tel:015159266">01-5159266</a></li>
+            <li><strong>Nepal Mediciti Hospital Bank (Nakhkhu):</strong> <a href="tel:014217766">01-4217766</a></li>
         </ul>
+    </div>
+</section>
     </aside>
 </section>
 
-<section class="home-features" aria-label="Key features">
-    <article class="feature-card">
-        <h3>Easy donor registration</h3>
-        <p>Simple sign-up with phone, email verification, and live location capture.</p>
-    </article>
-    <article class="feature-card">
-        <h3>Quick blood request process</h3>
-        <p>Submit a request in minutes and instantly receive nearby donor recommendations.</p>
-    </article>
-    <article class="feature-card">
-        <h3>Location-based donor search</h3>
-        <p>Distance-aware matching helps connect patients to the closest available donors.</p>
-    </article>
-    <article class="feature-card">
-        <h3>Emergency support availability</h3>
-        <p>Urgent requests are prioritized to reduce delay in life-threatening situations.</p>
-    </article>
-</section>
+<section><div class="blood-chart-card">
+  <style>
+    .blood-chart-card{
+      width:100%;
+      max-width:none;
+      margin:40px 0;
+      padding:48px;
+      border-radius:24px;
+      background:linear-gradient(135deg,#fff5f5 0%,#fdfbfb 60%,#ffffff 100%);
+      box-shadow:0 1px 3px rgba(0,0,0,.04);
+      font-family:'Segoe UI',Arial,sans-serif;
+      position:relative;
+      overflow:hidden;
+    }
+    .blood-chart-card::before{
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;
+      height:4px;
+      background:linear-gradient(90deg,#e02424,#f08080,#e02424);
+    }
+    .bc-eyebrow{
+      color:#dc2626;
+      font-weight:700;
+      font-size:.8rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .bc-title{
+      font-size:2.2rem;
+      font-weight:800;
+      color:#1a1a2e;
+      margin:0 0 12px;
+    }
+    .bc-subtitle{
+      color:#5b6478;
+      font-size:1rem;
+      line-height:1.6;
+      max-width:700px;
+      margin-bottom:36px;
+    }
 
-<section class="stats-grid" aria-label="Impact statistics">
-    <article class="stat-card">
-        <p class="stat-label">Lives saved</p>
-        <p class="stat-value">{{ lives_saved }}</p>
-    </article>
-    <article class="stat-card">
-        <p class="stat-label">Registered donors</p>
-        <p class="stat-value">{{ registered_donors }}</p>
-    </article>
-    <article class="stat-card">
-        <p class="stat-label">Emergency requests fulfilled</p>
-        <p class="stat-value">{{ emergency_fulfilled }}</p>
-    </article>
-    <article class="stat-card">
-        <p class="stat-label">Available donors now</p>
-        <p class="stat-value">{{ available_donors }}</p>
-    </article>
+    .blood-chart-wrapper{display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;}
+    .blood-chart{border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(220,38,38,.08);}
+    .blood-chart th,.blood-chart td{text-align:center;vertical-align:middle;}
+    .receive-header{background:#dc2626;color:#fff;font-size:1.05rem;font-weight:700;padding:14px 0;}
+    .type-col{background:#dc2626;color:#fff;font-weight:700;padding:12px 16px;border-left:1px solid rgba(255,255,255,.2);}
+    .side-label{background:#f87171;color:#fff;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);padding:10px;}
+    .row-type{background:#f87171;color:#fff;font-weight:700;padding:12px 16px;}
+    .corner{background:transparent;}
+    .cell{width:52px;height:52px;border:1px solid #fde8e8;background:#fff;}
+    .drop{display:inline-block;width:20px;height:20px;background:#dc2626;transform:rotate(-45deg);border-radius:0 50% 50% 50%;}
+
+    .badges{display:flex;flex-direction:column;gap:24px;margin-top:4px;}
+    .drop-badge{width:130px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:0 50% 50% 50%;transform:rotate(-45deg);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.1);}
+    .drop-badge>*{transform:rotate(45deg);}
+    .donor .drop-badge{background:linear-gradient(135deg,#f59e0b,#d97706);}
+    .recipient .drop-badge{background:linear-gradient(135deg,#0f766e,#115e59);}
+    .drop-badge .label{font-size:.8rem;font-weight:600;}
+    .drop-badge .big{font-size:2rem;font-weight:800;}
+    .drop-badge .sub{font-size:.75rem;font-weight:600;text-align:center;padding:0 8px;}
+
+    @media (max-width:700px){
+      .blood-chart-card{padding:28px;}
+      .bc-title{font-size:1.6rem;}
+      .blood-chart-wrapper{flex-direction:column;}
+      .type-col,.row-type{padding:8px;font-size:.85rem;}
+    }
+  </style>
+
+  <div class="bc-eyebrow">Blood Compatibility</div>
+  <h2 class="bc-title">Know Your Match</h2>
+  <p class="bc-subtitle">
+    Understanding blood type compatibility helps ensure safe transfusions. Use this chart to see
+    which blood types you can donate to or receive from.
+  </p>
+
+  <div class="blood-chart-wrapper">
+    <table class="blood-chart">
+      <thead>
+        <tr>
+          <th class="corner" colspan="2"></th>
+          <th colspan="8" class="receive-header">You can receive type</th>
+        </tr>
+        <tr>
+          <th class="corner" colspan="2"></th>
+          <th class="type-col">O+</th><th class="type-col">O−</th>
+          <th class="type-col">A+</th><th class="type-col">A−</th>
+          <th class="type-col">B+</th><th class="type-col">B−</th>
+          <th class="type-col">AB+</th><th class="type-col">AB−</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th class="side-label" rowspan="8">If you are type</th>
+          <th class="row-type">O+</th>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">O−</th>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">A+</th>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">A−</th>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">B+</th>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">B−</th>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"></td>
+        </tr>
+        <tr>
+          <th class="row-type">AB+</th>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
+        </tr>
+        <tr>
+          <th class="row-type">AB−</th>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="badges">
+      <div class="badge donor">
+        <div class="drop-badge">
+          <span class="label">Type</span>
+          <span class="big">O−</span>
+          <span class="sub">Universal Donor</span>
+        </div>
+      </div>
+      <div class="badge recipient">
+        <div class="drop-badge">
+          <span class="label">Type</span>
+          <span class="big">AB+</span>
+          <span class="sub">Universal Recipient</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
 <section class="steps-panel" aria-label="How it works">
@@ -112,10 +237,7 @@
                     <span class="blood-drop">🩸</span>
                     <span>Weight at least 50 kg</span>
                 </li>
-                <li>
-                    <span class="blood-drop">🩸</span>
-                    <span>Have a hemoglobin level of 12.5 g/dL or more</span>
-                </li>
+               
                 <li>
                     <span class="blood-drop">🩸</span>
                     <span>Be in good physical and mental health</span>

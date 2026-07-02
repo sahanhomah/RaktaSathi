@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.db import transaction
+from django.views.decorators.cache import never_cache
 
 from .forms import DonorRegistrationForm, EmailOtpVerificationForm
 from .models import Donor
@@ -236,6 +237,7 @@ def register_donor(request):
 
 
 @login_required
+@never_cache
 def profile(request):
 	donor = Donor.objects.filter(user=request.user).first()
 	nearby_requests_count = 0
@@ -308,6 +310,7 @@ def profile(request):
 
 
 @login_required
+@never_cache
 def incoming_requests(request):
 	donor = Donor.objects.filter(user=request.user).first()
 	if donor is None:
