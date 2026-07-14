@@ -135,7 +135,7 @@
 
                 const metrics = getImageMetrics(img);
                 if (metrics.brightRatio < minBrightRatio) {
-                    resolve({ ok: false, message: 'Prescription image is too dark. Ensure good lighting when taking the photo.' });
+                    resolve({ ok: false, message: 'Prescription cannot be validated.' });
                     return;
                 }
                 if (metrics.textRatio < minTextRatio) {
