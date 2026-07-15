@@ -24,7 +24,7 @@
     <div class="urgent-banner-content">
         <p><strong>Emergency Help:</strong> Need blood urgently? Call any of these Kathmandu Valley blood banks and hospitals or submit an urgent blood request now.</p>
         <ul class="emergency-phone-list" aria-label="Major blood banks and hospital numbers in Kathmandu Valley">
-            <li><strong>Central NRCS Blood Bank (Soaltee-Mode):</strong> <a href="tel:014288485">01-4288485</a></li>
+            <li><strong>Nepal Red Cross Society/ Central Blood Transfusion Center:</strong> <a href="tel:015388485">01-5388485</a></li>
             <li><strong>Lalitpur NRCS Blood Bank (Pulchowk):</strong> <a href="tel:015427033">01-5427033</a></li>
             <li><strong>Bhaktapur NRCS Blood Bank:</strong> <a href="tel:016611661">01-6611661</a>, <a href="tel:016612266">01-6612266</a></li>
             <li><strong>Teaching Hospital Blood Bank (Maharajgunj):</strong> <a href="tel:0144123030">01-44123030</a>, <a href="tel:014410911">01-4410911</a></li>
@@ -39,173 +39,57 @@
     </aside>
 </section>
 
-<section><div class="blood-chart-card">
-  <style>
-    .blood-chart-card{
-      width:100%;
-      max-width:none;
-      margin:40px 0;
-      padding:48px;
-      border-radius:24px;
-      background:linear-gradient(135deg,#fff5f5 0%,#fdfbfb 60%,#ffffff 100%);
-      box-shadow:0 1px 3px rgba(0,0,0,.04);
-      font-family:'Segoe UI',Arial,sans-serif;
-      position:relative;
-      overflow:hidden;
-    }
-    .blood-chart-card::before{
-      content:"";
-      position:absolute;
-      top:0;left:0;right:0;
-      height:4px;
-      background:linear-gradient(90deg,#e02424,#f08080,#e02424);
-    }
-    .bc-eyebrow{
-      color:#dc2626;
-      font-weight:700;
-      font-size:.8rem;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      margin-bottom:10px;
-    }
-    .bc-title{
-      font-size:2.2rem;
-      font-weight:800;
-      color:#1a1a2e;
-      margin:0 0 12px;
-    }
-    .bc-subtitle{
-      color:#5b6478;
-      font-size:1rem;
-      line-height:1.6;
-      max-width:700px;
-      margin-bottom:36px;
-    }
-
-    .blood-chart-wrapper{display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;}
-    .blood-chart{border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(220,38,38,.08);}
-    .blood-chart th,.blood-chart td{text-align:center;vertical-align:middle;}
-    .receive-header{background:#dc2626;color:#fff;font-size:1.05rem;font-weight:700;padding:14px 0;}
-    .type-col{background:#dc2626;color:#fff;font-weight:700;padding:12px 16px;border-left:1px solid rgba(255,255,255,.2);}
-    .side-label{background:#f87171;color:#fff;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);padding:10px;}
-    .row-type{background:#f87171;color:#fff;font-weight:700;padding:12px 16px;}
-    .corner{background:transparent;}
-    .cell{width:52px;height:52px;border:1px solid #fde8e8;background:#fff;}
-    .drop{display:inline-block;width:20px;height:20px;background:#dc2626;transform:rotate(-45deg);border-radius:0 50% 50% 50%;}
-
-    .badges{display:flex;flex-direction:column;gap:24px;margin-top:4px;}
-    .drop-badge{width:130px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:0 50% 50% 50%;transform:rotate(-45deg);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.1);}
-    .drop-badge>*{transform:rotate(45deg);}
-    .donor .drop-badge{background:linear-gradient(135deg,#f59e0b,#d97706);}
-    .recipient .drop-badge{background:linear-gradient(135deg,#0f766e,#115e59);}
-    .drop-badge .label{font-size:.8rem;font-weight:600;}
-    .drop-badge .big{font-size:2rem;font-weight:800;}
-    .drop-badge .sub{font-size:.75rem;font-weight:600;text-align:center;padding:0 8px;}
-
-    @media (max-width:700px){
-      .blood-chart-card{padding:28px;}
-      .bc-title{font-size:1.6rem;}
-      .blood-chart-wrapper{flex-direction:column;}
-      .type-col,.row-type{padding:8px;font-size:.85rem;}
-    }
-  </style>
-
-  <div class="bc-eyebrow">Blood Compatibility</div>
-  <h2 class="bc-title">Know Your Match</h2>
-  <p class="bc-subtitle">
-    Understanding blood type compatibility helps ensure safe transfusions. Use this chart to see
-    which blood types you can donate to or receive from.
-  </p>
-
-  <div class="blood-chart-wrapper">
-    <table class="blood-chart">
-      <thead>
-        <tr>
-          <th class="corner" colspan="2"></th>
-          <th colspan="8" class="receive-header">You can receive type</th>
-        </tr>
-        <tr>
-          <th class="corner" colspan="2"></th>
-          <th class="type-col">O+</th><th class="type-col">O−</th>
-          <th class="type-col">A+</th><th class="type-col">A−</th>
-          <th class="type-col">B+</th><th class="type-col">B−</th>
-          <th class="type-col">AB+</th><th class="type-col">AB−</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th class="side-label" rowspan="8">If you are type</th>
-          <th class="row-type">O+</th>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">O−</th>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">A+</th>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">A−</th>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td><td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">B+</th>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">B−</th>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"></td>
-        </tr>
-        <tr>
-          <th class="row-type">AB+</th>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"><span class="drop"></span></td><td class="cell"><span class="drop"></span></td>
-        </tr>
-        <tr>
-          <th class="row-type">AB−</th>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-          <td class="cell"></td><td class="cell"><span class="drop"></span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="badges">
-      <div class="badge donor">
-        <div class="drop-badge">
-          <span class="label">Type</span>
-          <span class="big">O−</span>
-          <span class="sub">Universal Donor</span>
-        </div>
-      </div>
-      <div class="badge recipient">
-        <div class="drop-badge">
-          <span class="label">Type</span>
-          <span class="big">AB+</span>
-          <span class="sub">Universal Recipient</span>
-        </div>
-      </div>
+<section class="availability-dashboard" aria-label="Blood group availability">
+  <div class="availability-dashboard-header">
+    <div>
+      <p class="availability-eyebrow">Blood Group Availability</p>
+      <h2 class="availability-title">Current donor counts across Nepal</h2>
+    </div>
+    <div class="availability-updated">
+      <span>Last updated</span>
+      <strong>{% if last_available_update %}{{ last_available_update|date:"n/j/Y, g:i A" }}{% else %}Just now{% endif %}</strong>
     </div>
   </div>
-</div>
+
+  <div class="availability-grid" role="list">
+    {% for tile in blood_group_tiles %}
+      <article class="availability-tile" role="listitem">
+        <span class="availability-group">{{ tile.blood_group }}</span>
+        <span class="availability-count" data-count-up="{{ tile.count }}">{{ tile.count }}</span>
+      </article>
+    {% endfor %}
+
+    <article class="availability-total">
+      <span class="availability-total-label">Total</span>
+      <span class="availability-total-value" data-count-up="{{ available_donors_total }}">{{ available_donors_total }}</span>
+    </article>
+  </div>
 </section>
+
+<section class="stats-grid" aria-label="Platform stats">
+  <article class="stat-card">
+    <p class="stat-label">Registered donors</p>
+    <p class="stat-value" data-count-up="{{ registered_donors }}">{{ registered_donors }}</p>
+    <p class="stat-note">Verified donors currently in the system</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Requests made</p>
+    <p class="stat-value" data-count-up="{{ total_requests }}">{{ total_requests }}</p>
+    <p class="stat-note">Blood requests submitted through the platform</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Lives saved</p>
+    <p class="stat-value" data-count-up="{{ lives_saved }}">{{ lives_saved }}</p>
+    <p class="stat-note">Completed requests marked fulfilled</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Available donors</p>
+    <p class="stat-value" data-count-up="{{ available_donors }}">{{ available_donors }}</p>
+    <p class="stat-note">Donors ready for matching right now</p>
+  </article>
+</section>
+
+
 
 <section class="steps-panel" aria-label="How it works">
     <div class="panel-header">
@@ -255,4 +139,51 @@
         </div>
     </div>
 </section>
+{% block extra_js %}
+<script>
+  (function () {
+    const counters = document.querySelectorAll('[data-count-up]');
+    if (!counters.length) {
+      return;
+    }
+
+    const formatNumber = new Intl.NumberFormat('en-US').format;
+    const duration = 1200;
+
+    const animateCounter = (node) => {
+      const target = Number(node.dataset.countUp || 0);
+      const start = performance.now();
+
+      const tick = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        node.textContent = formatNumber(Math.round(target * eased));
+
+        if (progress < 1) {
+          window.requestAnimationFrame(tick);
+        }
+      };
+
+      window.requestAnimationFrame(tick);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, observerInstance) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          animateCounter(entry.target);
+          observerInstance.unobserve(entry.target);
+        });
+      }, { threshold: 0.35 });
+
+      counters.forEach((node) => observer.observe(node));
+    } else {
+      counters.forEach(animateCounter);
+    }
+  })();
+</script>
+{% endblock %}
 {% endblock %}

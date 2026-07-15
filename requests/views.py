@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
@@ -29,12 +30,29 @@ EMAIL_NOTIFICATION_RADIUS_KM = 5.0
 
 def home(request):
 	_refresh_expired_donor_availability()
+	available_donor_groups = {
+		row['blood_group']: row['count']
+		for row in Donor.objects.filter(is_available=True)
+			.values('blood_group')
+			.annotate(count=Count('id'))
+	}
+	blood_group_tiles = [
+		{
+			'blood_group': blood_group,
+			'count': available_donor_groups.get(blood_group, 0),
+		}
+		for blood_group, _label in Donor.BLOOD_GROUP_CHOICES
+	]
+	latest_available_update = Donor.objects.filter(is_available=True).order_by('-updated_at').values_list('updated_at', flat=True).first()
 	context = {
 		'available_donors': Donor.objects.filter(is_available=True).count(),
 		'total_requests': BloodRequest.objects.count(),
 		'registered_donors': Donor.objects.count(),
 		'lives_saved': BloodRequest.objects.filter(status='fulfilled').count(),
 		'emergency_fulfilled': BloodRequest.objects.filter(status='fulfilled', urgency='emergency').count(),
+		'blood_group_tiles': blood_group_tiles,
+		'available_donors_total': sum(item['count'] for item in blood_group_tiles),
+		'last_available_update': latest_available_update,
 	}
 	return render(request, 'home.html', context)
 

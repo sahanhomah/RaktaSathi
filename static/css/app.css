@@ -254,6 +254,150 @@ body {
     gap: 1rem;
 }
 
+.availability-dashboard {
+    margin-bottom: 1.5rem;
+    padding: 1.35rem;
+    border-radius: calc(var(--bb-radius) * 1.25);
+    background: linear-gradient(180deg, #fffdfd, #fff5f5 100%);
+    border: 1px solid rgba(184, 39, 39, 0.1);
+    box-shadow: var(--bb-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.availability-dashboard::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #e22a2a, #c81f1f, #7f1d1d);
+}
+
+.availability-dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.availability-eyebrow {
+    margin: 0;
+    color: var(--bb-danger);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.availability-title {
+    margin: 0.2rem 0 0;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    line-height: 1.15;
+}
+
+.availability-updated {
+    min-width: 170px;
+    padding: 0.8rem 0.9rem;
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(184, 39, 39, 0.12);
+    text-align: right;
+}
+
+.availability-updated span {
+    display: block;
+    color: var(--bb-muted);
+    font-size: 0.82rem;
+}
+
+.availability-updated strong {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--bb-ink);
+    font-size: 0.95rem;
+}
+
+.availability-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.availability-tile,
+.availability-total {
+    min-height: 4.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(56, 77, 112, 0.08);
+    box-shadow: 0 8px 20px rgba(19, 34, 56, 0.05);
+}
+
+.availability-group {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--bb-ink);
+}
+
+.availability-count {
+    font-size: clamp(1.45rem, 2vw, 2rem);
+    font-weight: 800;
+    color: var(--bb-danger);
+    line-height: 1;
+}
+
+.availability-total {
+    background: linear-gradient(135deg, #d63a3a, #9c1f1f);
+    color: #fff;
+    border-color: transparent;
+}
+
+.availability-total-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.availability-total-value {
+    font-size: clamp(1.7rem, 2.4vw, 2.35rem);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stat-card {
+    background: linear-gradient(180deg, #ffffff, #fff8f8);
+    border: 1px solid rgba(56, 77, 112, 0.08);
+    border-radius: var(--bb-radius);
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--bb-shadow);
+}
+
+.stat-label {
+    margin: 0;
+    color: var(--bb-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.stat-value {
+    margin: 0.35rem 0 0;
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--bb-danger);
+}
+
+.stat-note {
+    margin: 0.55rem 0 0;
+    color: var(--bb-muted);
+    font-size: 0.92rem;
+}
+
 .btn.primary {
     background: #e22a2a;
     border-color: #cc2431;

@@ -30,6 +30,12 @@ RaktaSathi is an online platform that helps people find and donate blood easily.
 5. Start the development server:
    - `python manage.py runserver`
 
+## Test Data
+To create clearly labeled sample donor records for development or demos, run:
+- `python manage.py seed_test_donors --count 100`
+
+Use `--dry-run` first if you want to preview the generated donors without writing to the database.
+
 ## Email OTP
 OTP is enabled for donor registration.
 - If SMTP credentials are configured, OTP is sent to the real email inbox.
