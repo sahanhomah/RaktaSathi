@@ -246,6 +246,13 @@ def profile(request):
 		'district': '',
 		'country': '',
 	}
+	donation_history = {
+		'history': [],
+		'total_completed_donations': 0,
+		'last_completed_donation': None,
+		'next_donation_eligible_at': None,
+		'next_donation_eligible': False,
+	}
 
 	if donor is None:
 		messages.info(request, 'No donor profile is linked to this account yet.')

@@ -139,9 +139,10 @@
                     <div>
                         <p class="donor-name">{{ item.donor.full_name }}</p>
                         <p class="donor-meta mb-0"><span class="badge text-bg-danger">{{ item.donor.blood_group }}</span> • {{ item.donor.phone }}</p>
+                        <p class="donor-meta mb-0">Score: {{ item.score|floatformat:2 }}</p>
                     </div>
                     <div class="donor-distance">
-                        {{ item.distance_km|floatformat:2 }} km
+                        {{ item.distance|floatformat:2 }} km
                     </div>
                 </div>
                 </div>

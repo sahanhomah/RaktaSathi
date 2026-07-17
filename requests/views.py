@@ -11,6 +11,7 @@ from notifications.services import send_email_notification_to_donor
 
 from .forms import BloodRequestForm
 from .models import BloodRequest
+from services.recommendation_service import RecommendationService
 
 
 def _mark_donor_unavailable_after_completion(donor):
@@ -121,6 +122,9 @@ def request_blood(request):
 			request_record = form.save(commit=False)
 			request_record.requester_user = request.user
 			request_record.save()
+
+			recommended = RecommendationService(request_record).rank_donors()[:5]
+
 			eligible_matches = []
 			eligible = Donor.objects.filter(is_available=True).exclude(user=request.user)
 			for donor in eligible:
@@ -135,7 +139,6 @@ def request_blood(request):
 				eligible_matches.append({'donor': donor, 'distance_km': distance_km})
 
 			eligible_matches.sort(key=lambda item: item['distance_km'])
-			recommended = eligible_matches[:5]
 
 			notified_count = 0
 			for item in eligible_matches:

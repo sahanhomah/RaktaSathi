@@ -1,33 +1,116 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
-from django.contrib.messages import get_messages
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
-from unittest.mock import patch
-from django.utils import timezone
-from datetime import timedelta
 
-from requests.models import BloodRequest
+# Create your tests here.
 
-from .forms import DonorRegistrationForm
-from .models import Donor
+	def test_donor_creation(self):
+		"""Test basic donor creation"""
+		self.assertEqual(self.donor.full_name, 'John Doe')
+		self.assertEqual(self.donor.blood_group, 'A+')
+		self.assertTrue(self.donor.is_available)
+
+	def test_donor_string_representation(self):
+		"""Test donor __str__ method"""
+		self.assertEqual(str(self.donor), 'John Doe (A+)')
+
+	def test_mark_unavailable_until_default(self):
+		"""Test marking donor unavailable with default 3-month duration"""
+		self.donor.mark_unavailable_until()
+		self.assertFalse(self.donor.is_available)
+		self.assertIsNotNone(self.donor.availability_reenable_at)
+
+	def test_mark_unavailable_until_custom_date(self):
+		"""Test marking donor unavailable with custom date"""
+		custom_date = timezone.now() + timedelta(days=30)
+		self.donor.mark_unavailable_until(reenable_at=custom_date)
+		self.assertFalse(self.donor.is_available)
+		self.assertEqual(self.donor.availability_reenable_at, custom_date)
+
+	def test_refresh_availability_when_expired(self):
+		"""Test refreshing availability when expiration date has passed"""
+		past_date = timezone.now() - timedelta(days=1)
+		self.donor.is_available = False
+		self.donor.availability_reenable_at = past_date
+		self.donor.save()
+
+		result = self.donor.refresh_availability()
+		self.assertTrue(result)
+		self.assertTrue(self.donor.is_available)
+		self.assertIsNone(self.donor.availability_reenable_at)
+
+	def test_refresh_availability_not_expired(self):
+		"""Test refresh availability when still unavailable"""
+		future_date = timezone.now() + timedelta(days=10)
+		self.donor.is_available = False
+		self.donor.availability_reenable_at = future_date
+		self.donor.save()
+
+		result = self.donor.refresh_availability()
+		self.assertFalse(result)
+		self.assertFalse(self.donor.is_available)
+
+	def test_refresh_availability_already_available(self):
+		"""Test refresh when donor is already available"""
+		result = self.donor.refresh_availability()
+		self.assertFalse(result)
+		self.assertTrue(self.donor.is_available)
+
+	def test_refresh_expired_availability_classmethod(self):
+		"""Test bulk refresh of expired unavailability"""
+		# Mark the initial donor as unavailable in the past
+		self.donor.is_available = False
+		self.donor.availability_reenable_at = timezone.now() - timedelta(days=1)
+		self.donor.save()
+		
+		donor2 = Donor.objects.create(
+			full_name='Jane Doe',
+			phone='+9779887654321',
+			blood_group='B+',
+			latitude='27.7172',
+			longitude='85.3240',
+			is_available=False,
+			availability_reenable_at=timezone.now() - timedelta(days=1),
+		)
+		donor3 = Donor.objects.create(
+			full_name='Bob Smith',
+			phone='+9779876543210',
+			blood_group='O+',
+			latitude='27.7172',
+			longitude='85.3240',
+			is_available=False,
+			availability_reenable_at=timezone.now() + timedelta(days=5),
+		)
+
+		refreshed_count = Donor.refresh_expired_availability()
+		self.assertEqual(refreshed_count, 2)
+
+		self.donor.refresh_from_db()
+		donor2.refresh_from_db()
+		donor3.refresh_from_db()
+		self.assertTrue(self.donor.is_available)
+		self.assertTrue(donor2.is_available)
+		self.assertFalse(donor3.is_available)
+
+	def test_blood_group_choices(self):
+		"""Test all blood group choices"""
+		blood_groups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+		for i, bg in enumerate(blood_groups):
+			donor = Donor.objects.create(
+				full_name=f'Donor {bg}',
+				phone=f'+977981234567{i}',
+				blood_group=bg,
+				latitude='27.7172',
+				longitude='85.3240',
+			)
+			self.assertEqual(donor.blood_group, bg)
 
 
-User = get_user_model()
-
-
-def build_test_prescription_file(filename='prescription.png'):
-	return SimpleUploadedFile(
-		filename,
-		(
-			b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
-			b'\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfeA\x86\x8d\x00\x00\x00\x00IEND\xaeB`\x82'
-		),
-		content_type='image/png',
-	)
-
+# ============================================================================
+# FORM TESTS
+# ============================================================================
 
 class DonorRegistrationFormTests(TestCase):
+	"""Test suite for Donor Registration Form"""
+	
 	def _base_payload(self, phone):
 		return {
 			'full_name': 'Test Donor',
@@ -42,11 +125,13 @@ class DonorRegistrationFormTests(TestCase):
 		}
 
 	def test_normalizes_10_digit_nepali_phone(self):
+		"""Test phone normalization with 10-digit format"""
 		form = DonorRegistrationForm(data=self._base_payload('9812345678'))
 		self.assertTrue(form.is_valid())
 		self.assertEqual(form.cleaned_data['phone'], '+9779812345678')
 
 	def test_normalizes_number_with_leading_zero(self):
+		"""Test phone normalization with leading zero"""
 		form = DonorRegistrationForm(data=self._base_payload('09812345678'))
 		self.assertTrue(form.is_valid())
 		self.assertEqual(form.cleaned_data['phone'], '+9779812345678')

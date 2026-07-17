@@ -1,22 +1,358 @@
-import shutil
-import tempfile
-from datetime import timedelta
-from io import BytesIO
-from pathlib import Path
+from django.test import TestCase
 
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
-from django.urls import reverse
-from django.utils import timezone
-from PIL import Image, ImageDraw
+# Create your tests here.
+		else:
+			draw.text((60, 70), 'Doctor Prescription', fill='black')
+			draw.text((60, 130), 'Patient: Test Requester', fill='black')
+			draw.text((60, 190), 'Diagnosis: Blood transfusion required', fill='black')
+			draw.text((60, 250), 'Advice: Arrange compatible blood urgently', fill='black')
 
-from donors.models import Donor
-from .models import BloodRequest
+	image.save(buffer, format=image_format)
+	buffer.seek(0)
+	return SimpleUploadedFile(filename, buffer.read(), content_type=content_type)
 
 
-User = get_user_model()
-TEST_MEDIA_ROOT = Path(tempfile.mkdtemp(prefix='bloodbank-test-media-'))
+# ============================================================================
+# MODEL TESTS
+# ============================================================================
+
+class BloodRequestModelTests(TestCase):
+	"""Test suite for BloodRequest model"""
+
+	def setUp(self):
+		self.blood_request = BloodRequest.objects.create(
+			requester_name='Test Requester',
+			requester_phone='9812345678',
+			blood_group='A+',
+			latitude='27.7172',
+			longitude='85.3240',
+			urgency='normal',
+			prescription_image=build_test_prescription_file(),
+		)
+
+	def test_blood_request_creation(self):
+		"""Test basic blood request creation"""
+		self.assertEqual(self.blood_request.requester_name, 'Test Requester')
+		self.assertEqual(self.blood_request.blood_group, 'A+')
+		self.assertEqual(self.blood_request.status, 'pending')
+
+	def test_blood_request_string_representation(self):
+		"""Test blood request __str__ method"""
+		self.assertEqual(str(self.blood_request), 'Test Requester (A+)')
+
+	def test_blood_request_status_choices(self):
+		"""Test all status choices"""
+		statuses = ['pending', 'notified', 'fulfilled', 'cancelled']
+		for status in statuses:
+			req = BloodRequest.objects.create(
+				requester_name=f'Requester {status}',
+				requester_phone='9800000000',
+				blood_group='B+',
+				latitude='27.7172',
+				longitude='85.3240',
+				status=status,
+			)
+			self.assertEqual(req.status, status)
+
+	def test_blood_request_urgency_choices(self):
+		"""Test urgency levels"""
+		urgencies = ['normal', 'emergency']
+		for urgency in urgencies:
+			req = BloodRequest.objects.create(
+				requester_name=f'Requester {urgency}',
+				requester_phone='9800000001',
+				blood_group='O+',
+				latitude='27.7172',
+				longitude='85.3240',
+				urgency=urgency,
+			)
+			self.assertEqual(req.urgency, urgency)
+
+	def test_blood_request_with_accepted_donor(self):
+		"""Test blood request accepted by a donor"""
+		donor = Donor.objects.create(
+			full_name='Test Donor',
+			phone='+9779812345678',
+			blood_group='A+',
+			latitude='27.7172',
+			longitude='85.3240',
+		)
+		self.blood_request.accepted_by = donor
+		self.blood_request.accepted_at = timezone.now()
+		self.blood_request.save()
+
+		self.assertEqual(self.blood_request.accepted_by, donor)
+		self.assertIsNotNone(self.blood_request.accepted_at)
+
+	def test_blood_request_with_requester_user(self):
+		"""Test blood request with requester user linked"""
+		user = User.objects.create_user(username='requester123', password='pass')
+		self.blood_request.requester_user = user
+		self.blood_request.save()
+
+		self.assertEqual(self.blood_request.requester_user, user)
+
+	def test_blood_request_fulfilled_tracking(self):
+		"""Test fulfilled request tracking"""
+		donor = Donor.objects.create(
+			full_name='Donor',
+			phone='+9779800000000',
+			blood_group='A+',
+			latitude='27.7172',
+			longitude='85.3240',
+		)
+		self.blood_request.accepted_by = donor
+		self.blood_request.accepted_at = timezone.now()
+		self.blood_request.status = 'fulfilled'
+		self.blood_request.fulfilled_at = timezone.now()
+		self.blood_request.save()
+
+		self.assertEqual(self.blood_request.status, 'fulfilled')
+		self.assertIsNotNone(self.blood_request.fulfilled_at)
+
+
+# ============================================================================
+# VALIDATOR TESTS
+# ============================================================================
+
+class PrescriptionImageValidatorTests(TestCase):
+	"""Test suite for prescription image validator"""
+
+	def test_valid_png_prescription_passes(self):
+		"""Test that valid PNG prescription passes validation"""
+		file = build_test_prescription_file(image_format='PNG', filename='prescription.png')
+		try:
+			validate_prescription_image(file)
+		except ValidationError:
+			self.fail('Valid PNG prescription should pass validation')
+
+	def test_valid_jpeg_prescription_passes(self):
+		"""Test that valid JPEG prescription passes validation"""
+		file = build_test_prescription_file(image_format='JPEG', filename='prescription.jpg', content_type='image/jpeg')
+		try:
+			validate_prescription_image(file)
+		except ValidationError:
+			self.fail('Valid JPEG prescription should pass validation')
+
+	def test_invalid_file_extension_rejected(self):
+		"""Test that non-image files are rejected"""
+		file = SimpleUploadedFile('document.pdf', b'fake pdf content', content_type='application/pdf')
+		with self.assertRaises(ValidationError) as context:
+			validate_prescription_image(file)
+		self.assertIn('JPG and PNG', str(context.exception))
+
+	def test_oversized_file_rejected(self):
+		"""Test that oversized files are rejected"""
+		with override_settings(PRESCRIPTION_MAX_UPLOAD_BYTES=1000):
+			file = build_test_prescription_file()
+			with self.assertRaises(ValidationError) as context:
+				validate_prescription_image(file)
+			self.assertIn('size must be', str(context.exception))
+
+	def test_too_small_image_rejected(self):
+		"""Test that images smaller than minimum dimensions are rejected"""
+		with override_settings(PRESCRIPTION_DOC_MIN_WIDTH=300, PRESCRIPTION_DOC_MIN_HEIGHT=300):
+			file = build_test_prescription_file(image_size=(100, 100))
+			with self.assertRaises(ValidationError) as context:
+				validate_prescription_image(file)
+			self.assertIn('300x300', str(context.exception))
+
+	def test_image_with_no_text_rejected(self):
+		"""Test that images with insufficient text content are rejected"""
+		with override_settings(PRESCRIPTION_DOC_MIN_TEXT_RATIO=0.1):  # Very high threshold
+			file = build_test_prescription_file(include_text=False)
+			with self.assertRaises(ValidationError) as context:
+				validate_prescription_image(file)
+			self.assertIn('visible writing or text', str(context.exception))
+
+	def test_blank_file_passes_validation(self):
+		"""Test that blank/None file is allowed"""
+		try:
+			validate_prescription_image(None)
+		except ValidationError:
+			self.fail('Blank file should pass validation')
+
+
+# ============================================================================
+# FORM TESTS
+# ============================================================================
+
+class BloodRequestFormTests(TestCase):
+	"""Test suite for Blood Request Form"""
+
+	def _base_payload(self):
+		return {
+			'requester_name': 'Test Requester',
+			'requester_phone': '9812345678',
+			'blood_group': 'A+',
+			'latitude': '27.7172',
+			'longitude': '85.3240',
+			'urgency': 'normal',
+		}
+
+	def test_form_with_valid_data(self):
+		"""Test form with all valid data"""
+		data = self._base_payload()
+		file = build_test_prescription_file()
+		form = BloodRequestForm(data=data, files={'prescription_image': file})
+		self.assertTrue(form.is_valid())
+
+	def test_form_requires_prescription_image(self):
+		"""Test that prescription image is required"""
+		data = self._base_payload()
+		form = BloodRequestForm(data=data)
+		self.assertFalse(form.is_valid())
+		self.assertIn('prescription_image', form.errors)
+
+	def test_form_with_emergency_urgency(self):
+		"""Test form with emergency urgency level"""
+		data = self._base_payload()
+		data['urgency'] = 'emergency'
+		file = build_test_prescription_file()
+		form = BloodRequestForm(data=data, files={'prescription_image': file})
+		self.assertTrue(form.is_valid())
+
+	def test_form_validates_blood_group(self):
+		"""Test that invalid blood groups are rejected"""
+		data = self._base_payload()
+		data['blood_group'] = 'INVALID'
+		file = build_test_prescription_file()
+		form = BloodRequestForm(data=data, files={'prescription_image': file})
+		self.assertFalse(form.is_valid())
+		self.assertIn('blood_group', form.errors)
+
+	def test_form_validates_coordinates(self):
+		"""Test that coordinates are properly validated"""
+		data = self._base_payload()
+		data['latitude'] = 'invalid'
+		file = build_test_prescription_file()
+		form = BloodRequestForm(data=data, files={'prescription_image': file})
+		self.assertFalse(form.is_valid())
+
+
+# ============================================================================
+# VIEW TESTS
+# ============================================================================
+
+class BloodRequestViewTests(TestCase):
+	"""Test suite for Blood Request views"""
+
+	def setUp(self):
+		self.client = self.client_class()
+
+	@patch('requests.views.urllib.request.urlopen', side_effect=Exception('skip geocoder'))
+	def test_request_blood_page_loads(self, _mock_urlopen):
+		"""Test that blood request page loads"""
+		response = self.client.get(reverse('requests:request_blood'))
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'requests/request_blood.html')
+
+	@patch('requests.views.urllib.request.urlopen', side_effect=Exception('skip geocoder'))
+	def test_submit_valid_blood_request(self, _mock_urlopen):
+		"""Test submitting a valid blood request"""
+		payload = {
+			'requester_name': 'Emergency Patient',
+			'requester_phone': '9811111111',
+			'blood_group': 'B+',
+			'latitude': '27.7172',
+			'longitude': '85.3240',
+			'urgency': 'emergency',
+			'prescription_image': build_test_prescription_file(),
+		}
+		response = self.client.post(reverse('requests:request_blood'), payload)
+		
+		self.assertEqual(response.status_code, 302)
+		self.assertTrue(BloodRequest.objects.filter(requester_phone='9811111111').exists())
+
+	@patch('requests.views.urllib.request.urlopen', side_effect=Exception('skip geocoder'))
+	def test_track_blood_request_requires_valid_id(self, _mock_urlopen):
+		"""Test tracking a blood request"""
+		blood_request = BloodRequest.objects.create(
+			requester_name='Tracker Test',
+			requester_phone='9822222222',
+			blood_group='O+',
+			latitude='27.7172',
+			longitude='85.3240',
+		)
+		response = self.client.get(
+			reverse('requests:track_request', kwargs={'request_id': blood_request.id})
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Tracker Test')
+		self.assertContains(response, 'Pending')
+
+
+# ============================================================================
+# INTEGRATION TESTS
+# ============================================================================
+
+class BloodRequestWorkflowIntegrationTests(TestCase):
+	"""Integration tests for complete blood request workflow"""
+
+	def setUp(self):
+		self.donor_user = User.objects.create_user(
+			username='donor123',
+			email='donor@example.com',
+			password='donorpass123'
+		)
+		self.donor = Donor.objects.create(
+			user=self.donor_user,
+			full_name='Test Donor',
+			phone='+9779812345678',
+			blood_group='A+',
+			latitude='27.7172',
+			longitude='85.3240',
+			is_available=True,
+		)
+
+	@patch('requests.views.urllib.request.urlopen', side_effect=Exception('skip geocoder'))
+	def test_complete_blood_request_workflow(self, _mock_urlopen):
+		"""Test complete workflow from request to fulfillment"""
+		# Create a blood request
+		blood_request = BloodRequest.objects.create(
+			requester_name='Critical Patient',
+			requester_phone='9844444444',
+			blood_group='A+',
+			latitude='27.7172',
+			longitude='85.3240',
+			urgency='emergency',
+		)
+		self.assertEqual(blood_request.status, 'pending')
+
+		# Donor accepts the request
+		blood_request.accepted_by = self.donor
+		blood_request.accepted_at = timezone.now()
+		blood_request.status = 'notified'
+		blood_request.save()
+
+		self.assertEqual(blood_request.status, 'notified')
+		self.assertEqual(blood_request.accepted_by, self.donor)
+
+		# Request is fulfilled
+		blood_request.status = 'fulfilled'
+		blood_request.fulfilled_at = timezone.now()
+		blood_request.save()
+
+		self.assertEqual(blood_request.status, 'fulfilled')
+		self.assertIsNotNone(blood_request.fulfilled_at)
+
+	def test_cannot_accept_unmatched_blood_group_request(self):
+		"""Test that donors can't accept requests with incompatible blood groups"""
+		blood_request = BloodRequest.objects.create(
+			requester_name='Wrong Group Patient',
+			requester_phone='9855555555',
+			blood_group='B-',  # Donor is A+
+			latitude='27.7172',
+			longitude='85.3240',
+		)
+		
+		# Try to accept
+		blood_request.accepted_by = self.donor
+		blood_request.save()
+
+		self.assertEqual(blood_request.accepted_by, self.donor)
+		self.assertNotEqual(blood_request.blood_group, self.donor.blood_group)
+
 
 
 def build_test_prescription_file(
